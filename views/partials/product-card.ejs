@@ -1,0 +1,19 @@
+<article class="batch-card">
+  <a class="batch-visual" href="/product/<%= product.slug %>">
+    <% if (product.image) { %>
+      <img src="<%= product.image %>" alt="<%= product.name %>">
+    <% } else { %>
+      <div class="plate">
+        <span><%= product.category_name %></span>
+        <strong><%= product.name.replace(' (starter)', '') %></strong>
+      </div>
+    <% } %>
+  </a>
+  <div class="batch-body">
+    <% if (product.is_starter) { %><span class="starter-flag">Starter</span><% } %>
+    <div class="batch-cat"><%= product.category_name %></div>
+    <h3><a href="/product/<%= product.slug %>"><%= product.name %></a></h3>
+    <p class="price"><%= nzd(product.price_cents) %><% if (product.size) { %> · <%= product.size %><% } %></p>
+    <p class="muted"><%= product.short_description %></p>
+  </div>
+</article>

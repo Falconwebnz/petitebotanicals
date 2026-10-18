@@ -1,0 +1,42 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero <%= category.hero_image ? '' : 'plain' %>" <% if (category.hero_image) { %>style="--hero:url('<%= category.hero_image %>')"<% } %>>
+    <div class="still-wrap">
+      <p class="eyebrow">The Still Room</p>
+      <h1><%= category.name %></h1>
+      <p><%= category.intro %></p>
+    </div>
+  </section>
+  <section class="section category-products">
+    <div class="still-wrap">
+      <% if (!products.length) { %>
+        <div class="empty">This drawer is empty. Add a product from the still-room desk when the formula is ready.</div>
+      <% } else { %>
+        <div class="product-grid">
+          <% products.forEach(function (product) { %>
+            <%- include('partials/product-card', { product: product }) %>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </section>
+  <section class="faq-band" aria-labelledby="faq-heading">
+    <div class="still-wrap">
+      <h2 id="faq-heading">Questions</h2>
+      <% if (!faqs.length) { %>
+        <p class="faq-empty">Questions for this drawer will appear here.</p>
+      <% } else { %>
+        <div class="faq-list">
+          <% faqs.forEach(function (faq) { %>
+            <details class="faq-item">
+              <summary><%= faq.question %></summary>
+              <div class="faq-answer"><%= faq.answer %></div>
+            </details>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

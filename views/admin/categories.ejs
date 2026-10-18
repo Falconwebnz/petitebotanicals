@@ -1,0 +1,54 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main>
+  <%- include('../partials/desk-bar') %>
+  <section class="section" style="padding-top:1.4rem;">
+    <div class="still-wrap">
+      <h1 class="serif" style="font-size:3rem;">Drawers</h1>
+      <p class="muted">The four categories stay fixed. You can rewrite the intro, change the hero image, and keep each drawer’s questions in order.</p>
+      <% cats.forEach(function (cat) { %>
+        <article class="form-card">
+          <h2 class="serif" style="margin-top:0;"><%= cat.name %></h2>
+          <form method="post" action="/admin/categories/<%= cat.id %>" enctype="multipart/form-data">
+            <label for="intro-<%= cat.id %>">Intro</label>
+            <textarea id="intro-<%= cat.id %>" name="intro"><%= cat.intro || '' %></textarea>
+            <label for="hero-<%= cat.id %>">Hero image</label>
+            <% if (cat.hero_image) { %><p class="muted">Current: <%= cat.hero_image %></p><% } %>
+            <input id="hero-<%= cat.id %>" name="hero_image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+            <p style="margin-top:1rem;"><button class="btn-still" type="submit">Save <%= cat.name %></button></p>
+          </form>
+          <h3 class="serif" style="font-size:1.7rem;margin:1.6rem 0 0.4rem;">Questions</h3>
+          <% if (!cat.faqs.length) { %>
+            <p class="muted">No questions in this drawer yet.</p>
+          <% } %>
+          <% cat.faqs.forEach(function (faq, index) { %>
+            <form class="faq-admin" method="post" action="/admin/faqs/<%= faq.id %>">
+              <label for="q-<%= faq.id %>">Question</label>
+              <input id="q-<%= faq.id %>" name="question" type="text" value="<%= faq.question %>" required>
+              <label for="a-<%= faq.id %>">Answer</label>
+              <textarea id="a-<%= faq.id %>" name="answer" required><%= faq.answer %></textarea>
+              <div class="faq-admin-actions">
+                <button class="btn-still" type="submit">Save</button>
+                <% if (index > 0) { %>
+                  <button class="btn-line" type="submit" formaction="/admin/faqs/<%= faq.id %>/move" name="direction" value="up">Move up</button>
+                <% } %>
+                <% if (index < cat.faqs.length - 1) { %>
+                  <button class="btn-line" type="submit" formaction="/admin/faqs/<%= faq.id %>/move" name="direction" value="down">Move down</button>
+                <% } %>
+                <button class="btn-line" type="submit" formaction="/admin/faqs/<%= faq.id %>/delete">Remove</button>
+              </div>
+            </form>
+          <% }) %>
+          <form class="faq-admin faq-admin-new" method="post" action="/admin/categories/<%= cat.id %>/faqs">
+            <label for="new-q-<%= cat.id %>">New question</label>
+            <input id="new-q-<%= cat.id %>" name="question" type="text">
+            <label for="new-a-<%= cat.id %>">Answer</label>
+            <textarea id="new-a-<%= cat.id %>" name="answer"></textarea>
+            <p style="margin-top:0.9rem;"><button class="btn-line" type="submit">Add question</button></p>
+          </form>
+        </article>
+      <% }) %>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

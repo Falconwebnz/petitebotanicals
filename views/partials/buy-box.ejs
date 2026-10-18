@@ -1,0 +1,23 @@
+<div class="buy-col">
+  <p class="eyebrow"><%= product.category_name %></p>
+  <h1><%= product.name %></h1>
+  <% if (product.notes) { %><p><%= product.notes %></p><% } %>
+  <p class="buy-price"><%= nzd(product.price_cents) %></p>
+  <p class="muted"><%= product.size || 'Size to be set' %></p>
+  <% if (product.is_starter) { %>
+    <p class="starter-note">Starter listing. Replace the name, size, price and formula in the still-room desk before this is offered for sale. The price is a placeholder.</p>
+  <% } %>
+  <% if (product.in_stock) { %>
+    <form method="post" action="/cart/add">
+      <input type="hidden" name="id" value="<%= product.id %>">
+      <div class="qty-row">
+        <label for="qty-<%= product.id %>" class="mb-0">Quantity</label>
+        <input id="qty-<%= product.id %>" name="qty" type="number" min="1" max="12" value="1">
+      </div>
+      <button class="btn-still" type="submit">Add to basket</button>
+    </form>
+  <% } else { %>
+    <p class="starter-note">Out of the still room for now.</p>
+  <% } %>
+  <p class="fine">Made to be used, not saved for occasions. Prices in New Zealand dollars.</p>
+</div>

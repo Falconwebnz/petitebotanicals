@@ -1,0 +1,20 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Shop</p>
+      <h1>All small batches</h1>
+      <p><%= settings.shop_intro %></p>
+      <p><a href="/about">Read more about my story and standards</a></p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="still-wrap shop-grid">
+      <% products.forEach(function (product) { %>
+        <%- include('partials/product-card', { product: product }) %>
+      <% }) %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

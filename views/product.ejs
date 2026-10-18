@@ -1,0 +1,57 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <div class="still-wrap product-layout">
+    <div>
+      <div class="figure-frame">
+        <% if (product.image) { %>
+          <img src="<%= product.image %>" alt="<%= product.name %>">
+        <% } else { %>
+          <div class="plate">
+            <span><%= product.category_name %></span>
+            <strong><%= product.name.replace(' (starter)', '') %></strong>
+          </div>
+        <% } %>
+      </div>
+      <div class="mobile-buy" style="margin-top:1rem;">
+        <%- include('partials/buy-box', { product: product }) %>
+      </div>
+      <div class="card-block">
+        <h2>The scent</h2>
+        <div class="pre"><%= product.long_description %></div>
+      </div>
+      <% if (product.ingredients) { %>
+        <div class="card-block">
+          <h2>Botanicals</h2>
+          <div class="pre"><%= product.ingredients %></div>
+        </div>
+      <% } %>
+      <% if (product.how_to_use) { %>
+        <div class="card-block">
+          <h2>How to use</h2>
+          <div class="pre"><%= product.how_to_use %></div>
+        </div>
+      <% } %>
+      <% if (product.precautions) { %>
+        <div class="card-block">
+          <h2>Care</h2>
+          <div class="pre"><%= product.precautions %></div>
+        </div>
+      <% } %>
+      <% if (related.length) { %>
+        <div class="card-block">
+          <h2>Also on the bench</h2>
+          <div class="product-grid" style="margin-top:1rem;">
+            <% related.forEach(function (product) { %>
+              <%- include('partials/product-card', { product: product }) %>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    <div class="desktop-buy">
+      <%- include('partials/buy-box', { product: product }) %>
+    </div>
+  </div>
+</main>
+<%- include('partials/footer') %>

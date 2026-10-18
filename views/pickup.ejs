@@ -1,0 +1,27 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Arrival</p>
+      <h1>Local pick up Box</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:2rem;">
+    <div class="still-wrap about-layout">
+      <div class="story-mark">
+        <div class="logo-clip"><img src="/images/brand/logo.png" alt="Petite Botanicals logo"></div>
+        <p>Canterbury, New Zealand</p>
+        <p class="muted"><%= settings.pickup_aside || '' %></p>
+      </div>
+      <article>
+        <% if (settings.pickup_lead) { %><p><%= settings.pickup_lead %></p><% } %>
+        <% String(settings.pickup_body || '').split(/\n{2,}/).forEach(function (para) { %>
+          <% if (para.trim()) { %><p><%= para.trim() %></p><% } %>
+        <% }) %>
+        <p class="signature">Warm regards,<br>Jen</p>
+      </article>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

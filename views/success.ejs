@@ -1,0 +1,17 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="section">
+    <div class="still-wrap" style="max-width:680px;">
+      <p class="eyebrow">Canterbury</p>
+      <h1 class="serif" style="font-size:clamp(2.8rem,6vw,4.4rem);line-height:.95;">The order is with the still room.</h1>
+      <% if (paid) { %>
+        <p>Stripe confirmed this test payment. A receipt sits in the Stripe dashboard. The basket has been cleared.</p>
+      <% } else { %>
+        <p>This page is where a finished Stripe test checkout returns. If you opened it directly, no payment has been taken and the basket is unchanged.</p>
+      <% } %>
+      <p><a class="btn-still" href="/shop">Back to the shop</a></p>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

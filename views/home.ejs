@@ -1,0 +1,101 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="hero" style="background-image:url('<%= settings.hero_image %>')">
+    <div class="hero-scrim"></div>
+    <div class="still-wrap hero-inner">
+      <div class="logo-clip"><img src="/images/brand/logo.png" alt="Petite Botanicals"></div>
+      <p class="eyebrow" style="color:#e4c98a;"><%= settings.hero_kicker %></p>
+      <h1><%= settings.hero_headline %></h1>
+      <hr class="gold-rule">
+      <p class="subhead"><%= settings.hero_subhead %></p>
+      <div class="hero-actions">
+        <a class="btn-cream" href="/category/botanical-perfumes">Discover our collection</a>
+        <a class="btn-ghost" href="/about">Our story</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="still-wrap">
+      <div class="section-head">
+        <p class="eyebrow">Four drawers</p>
+        <h2>The atelier, not a catalogue.</h2>
+        <p>Perfume oils are finished and priced from the range notes. Balms, magnesium body sprays and room mists are open drawers, with starter cards where a formula is still to come.</p>
+      </div>
+      <div class="drawers">
+        <% cats.forEach(function (cat, i) { %>
+          <a class="drawer drawer-<%= i + 1 %>" href="/category/<%= cat.slug %>">
+            <span class="drawer-index">0<%= i + 1 %></span>
+            <span class="drawer-pull"></span>
+            <h3><%= cat.name %></h3>
+            <p><%= cat.intro %></p>
+            <span class="drawer-meta"><%= cat.count %> <%= cat.count === 1 ? 'card' : 'cards' %></span>
+          </a>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0;">
+    <div class="still-wrap">
+      <div class="section-head">
+        <p class="eyebrow">On the bench</p>
+        <h2>Small-batch perfume oils.</h2>
+        <p>10 ml roll-ons in organic golden jojoba. Alcohol-free, skin-close, made for daily wear.</p>
+      </div>
+      <div class="rail-wrap">
+        <div class="batch-rail">
+          <% featured.forEach(function (product) { %>
+            <div><%- include('partials/product-card', { product: product }) %></div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section trust">
+    <div class="still-wrap">
+      <div class="section-head">
+        <p class="eyebrow" style="color:#e4c98a;">How the house works</p>
+        <h2>What stays on the bench.</h2>
+      </div>
+      <div class="trust-grid">
+        <article>
+          <h3>Canterbury made</h3>
+          <p>Everything is made in small batches in Canterbury, New Zealand, with a small local team when the bench is busy.</p>
+        </article>
+        <article>
+          <h3>Botanical</h3>
+          <p>No synthetic fragrances, harsh preservatives or unnecessary additives. Perfume oils use organic essential oils in organic jojoba.</p>
+        </article>
+        <article>
+          <h3>Small batch</h3>
+          <p>Formulas are rested and checked before they leave the still room. Pricing stays accessible so the bottles can be used daily.</p>
+        </article>
+        <article>
+          <h3>Gentle by design</h3>
+          <p>Written for sensitive skin. Citrus oils, including bergamot, are the leave-on-friendly type. Not a medical treatment.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="still-wrap story-grid">
+      <div class="story-mark">
+        <div class="logo-clip"><img src="/images/brand/logo.png" alt=""></div>
+        <p class="eyebrow">The maker</p>
+        <h2 class="serif" style="font-size:2.4rem;margin:0;">Jen</h2>
+        <p class="muted">Canterbury, New Zealand</p>
+      </div>
+      <div class="story-copy">
+        <% String(settings.story_teaser || '').split(/\n\s*\n/).forEach(function (para) { %>
+          <p><%= para %></p>
+        <% }) %>
+        <p><a href="/about">Read more about my story and standards</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

@@ -1,0 +1,43 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main>
+  <%- include('../partials/desk-bar') %>
+  <section class="section" style="padding-top:1.4rem;">
+    <div class="still-wrap" style="max-width:820px;">
+      <h1 class="serif" style="font-size:3rem;">Pages</h1>
+
+      <form class="form-card" method="post" action="/admin/pages/standards">
+        <h2 class="serif" style="margin-top:0;">Our Standards</h2>
+        <label for="standards_aside">Side note</label>
+        <input id="standards_aside" name="standards_aside" type="text" value="<%= settings.standards_aside || '' %>">
+        <label for="standards_intro">Opening line</label>
+        <textarea id="standards_intro" name="standards_intro"><%= settings.standards_intro || '' %></textarea>
+        <label for="standards_point_1">Point 1</label>
+        <textarea id="standards_point_1" name="standards_point_1"><%= settings.standards_point_1 || '' %></textarea>
+        <label for="standards_point_2">Point 2</label>
+        <textarea id="standards_point_2" name="standards_point_2"><%= settings.standards_point_2 || '' %></textarea>
+        <label for="standards_point_3">Point 3</label>
+        <textarea id="standards_point_3" name="standards_point_3"><%= settings.standards_point_3 || '' %></textarea>
+        <label for="standards_heading">Section heading</label>
+        <input id="standards_heading" name="standards_heading" type="text" value="<%= settings.standards_heading || '' %>">
+        <label for="standards_body">Paragraphs</label>
+        <textarea id="standards_body" name="standards_body" style="min-height:220px;"><%= settings.standards_body || '' %></textarea>
+        <p class="muted">Leave a blank line between paragraphs.</p>
+        <p style="margin-top:1rem;"><button class="btn-still" type="submit">Save Our Standards</button></p>
+      </form>
+
+      <form class="form-card" method="post" action="/admin/pages/pickup">
+        <h2 class="serif" style="margin-top:0;">Local pick up Box</h2>
+        <label for="pickup_aside">Side note</label>
+        <input id="pickup_aside" name="pickup_aside" type="text" value="<%= settings.pickup_aside || '' %>">
+        <label for="pickup_lead">Opening line</label>
+        <textarea id="pickup_lead" name="pickup_lead"><%= settings.pickup_lead || '' %></textarea>
+        <label for="pickup_body">Paragraphs</label>
+        <textarea id="pickup_body" name="pickup_body" style="min-height:160px;"><%= settings.pickup_body || '' %></textarea>
+        <p class="muted">Leave a blank line between paragraphs.</p>
+        <p style="margin-top:1rem;"><button class="btn-still" type="submit">Save Local pick up Box</button></p>
+      </form>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,13 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="section">
+    <div class="still-wrap" style="max-width:680px;">
+      <p class="eyebrow">Checkout</p>
+      <h1 class="serif" style="font-size:clamp(2.8rem,6vw,4.4rem);line-height:.95;">Nothing was taken.</h1>
+      <p>Stripe checkout was cancelled. The basket is still here<% if (cart.items.length) { %>: <%= nzd(cart.subtotal) %><% } %>.</p>
+      <p><a class="btn-still" href="/cart">Return to the basket</a></p>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

@@ -1,0 +1,89 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Checkout</p>
+      <h1>Stripe test checkout</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:1.4rem;">
+    <div class="still-wrap" style="max-width:720px;">
+      <% if (!cart.items.length) { %>
+        <div class="empty">Nothing to pay for yet. <a href="/shop">Return to the shop</a>.</div>
+      <% } else { %>
+        <ul style="padding-left:1.1rem;">
+          <% cart.items.forEach(function (item) { %>
+            <li><%= item.product.name %> × <%= item.qty %> — <%= nzd(item.lineTotal) %></li>
+          <% }) %>
+        </ul>
+        <p class="buy-price"><%= nzd(cart.subtotal) %></p>
+        <% if (!stripeReady) { %>
+          <div class="notice">
+            <strong>Stripe test keys are required before payment can start.</strong>
+            <p>The basket is saved. Add <code>STRIPE_SECRET_KEY</code> and <code>STRIPE_PUBLISHABLE_KEY</code> to a <code>.env</code> file (see <code>.env.example</code>). Use test keys only — they begin with <code>sk_test_</code> and <code>pk_test_</code>. No card is needed to keep browsing, and this page will not charge anything until those keys are present.</p>
+          </div>
+        <% } %>
+        <% if (stripeError) { %>
+          <div class="notice"><strong><%= stripeError %></strong><p>The basket has not been cleared.</p></div>
+        <% } %>
+        <form id="checkout-form" method="post" action="/checkout">
+          <div class="fulfilment">
+            <h2 id="arrival-heading" class="fulfil-heading">How the parcel arrives</h2>
+            <input id="fulfil-delivery" type="radio" name="fulfilment" value="delivery" <%= fulfilment === 'pickup' ? '' : 'checked' %>>
+            <label for="fulfil-delivery"><%= copy.delivery_label %></label>
+            <input id="fulfil-pickup" type="radio" name="fulfilment" value="pickup" <%= fulfilment === 'pickup' ? 'checked' : '' %>>
+            <label for="fulfil-pickup">Local pickup</label>
+            <div id="shipping-box" class="fulfil-panel">
+              <label for="shipping_note">Shipping info</label>
+              <p class="fine" id="shipping-prompt"><%= copy.shipping_prompt %></p>
+              <textarea id="shipping_note" name="shipping_note" maxlength="500" aria-describedby="shipping-prompt"><%= shippingNote %></textarea>
+            </div>
+            <div id="pickup-box" class="fulfil-panel">
+              <p class="lockbox-line"><%= copy.lockbox_note %></p>
+              <label for="pickup_note">Pickup note</label>
+              <p class="fine" id="pickup-prompt">Name on the parcel, or a time that suits.</p>
+              <textarea id="pickup_note" name="pickup_note" maxlength="500" aria-describedby="pickup-prompt"><%= pickupNote %></textarea>
+            </div>
+          </div>
+          <button class="btn-still" type="submit" <%= stripeReady ? '' : 'disabled' %>>Continue to Stripe</button>
+        </form>
+        <p class="fine">Currency is NZD. Stripe is used in test mode. Do not enter a real card.</p>
+        <script>
+          (function () {
+            var delivery = document.getElementById('fulfil-delivery');
+            var pickup = document.getElementById('fulfil-pickup');
+            var shipping = document.getElementById('shipping_note');
+            var pickupNote = document.getElementById('pickup_note');
+            if (!delivery || !pickup || !shipping || !pickupNote) return;
+            var timer = null;
+            function send() {
+              var isPickup = pickup.checked;
+              var body = new URLSearchParams();
+              body.set('fulfilment', isPickup ? 'pickup' : 'delivery');
+              body.set('note', isPickup ? pickupNote.value : shipping.value);
+              fetch('/checkout/note', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  Accept: 'application/json'
+                },
+                body: body.toString(),
+                credentials: 'same-origin'
+              }).catch(function () {});
+            }
+            function queue() {
+              window.clearTimeout(timer);
+              timer = window.setTimeout(send, 350);
+            }
+            delivery.addEventListener('change', queue);
+            pickup.addEventListener('change', queue);
+            shipping.addEventListener('input', queue);
+            pickupNote.addEventListener('input', queue);
+          })();
+        </script>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

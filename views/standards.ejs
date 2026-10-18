@@ -1,0 +1,33 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">How the house works</p>
+      <h1>Our Standards</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:2rem;">
+    <div class="still-wrap about-layout">
+      <div class="story-mark">
+        <div class="logo-clip"><img src="/images/brand/logo.png" alt="Petite Botanicals logo"></div>
+        <p>Canterbury, New Zealand</p>
+        <p class="muted"><%= settings.standards_aside || '' %></p>
+      </div>
+      <article>
+        <% if (settings.standards_intro) { %><p><%= settings.standards_intro %></p><% } %>
+        <ul>
+          <% ['standards_point_1', 'standards_point_2', 'standards_point_3'].forEach(function (name) { %>
+            <% if (settings[name]) { %><li><%= settings[name] %></li><% } %>
+          <% }) %>
+        </ul>
+        <% if (settings.standards_heading) { %><h2><%= settings.standards_heading %></h2><% } %>
+        <% String(settings.standards_body || '').split(/\n{2,}/).forEach(function (para) { %>
+          <% if (para.trim()) { %><p><%= para.trim() %></p><% } %>
+        <% }) %>
+        <p class="signature">Warm regards,<br>Jen</p>
+      </article>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

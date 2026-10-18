@@ -1,0 +1,18 @@
+<%- include('../partials/head') %>
+<main>
+  <div class="still-wrap">
+    <form class="login-card" method="post" action="/admin/login">
+      <div class="logo-clip" style="margin-bottom:1rem;"><img src="/images/brand/logo.png" alt=""></div>
+      <p class="eyebrow">Still-room desk</p>
+      <h1 class="serif" style="font-size:2.6rem;margin:0 0 0.6rem;">Come in, Jen.</h1>
+      <% if (error) { %><div class="notice"><%= error %></div><% } %>
+      <label for="username">Name</label>
+      <input id="username" name="username" type="text" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <p style="margin-top:1.1rem;"><button class="btn-still" type="submit">Unlock the desk</button></p>
+      <p class="fine"><a href="/">Back to the shop</a></p>
+    </form>
+  </div>
+</main>
+<%- include('../partials/footer') %>

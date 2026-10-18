@@ -1,0 +1,52 @@
+<div class="topbar">Small batches · Made in Canterbury, New Zealand · No synthetic fragrance</div>
+<header class="site-header">
+  <div class="still-wrap header-row">
+    <button class="menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#stillMenu" aria-label="Open menu">
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true"><path d="M0 1h22M0 8h22M0 15h22" stroke="currentColor" stroke-width="1.4"/></svg>
+    </button>
+    <a class="brand" href="/">
+      <span class="logo-clip"><img src="/images/brand/logo.png" alt="Petite Botanicals"></span>
+      <span>
+        <span class="brand-name">Petite Botanicals</span>
+      </span>
+    </a>
+    <nav class="desktop-nav" aria-label="Shop">
+      <% categories.forEach(function (cat) { %>
+        <a class="<%= path.indexOf('/category/' + cat.slug) === 0 ? 'active' : '' %>" href="/category/<%= cat.slug %>"><%= cat.name.replace('Botanical ', '') %></a>
+      <% }) %>
+      <a class="<%= path === '/about' ? 'active' : '' %>" href="/about">Our Story</a>
+      <a class="<%= path === '/standards' ? 'active' : '' %>" href="/standards">Our Standards</a>
+      <a class="<%= path === '/pickup' ? 'active' : '' %>" href="/pickup">Delivery & Pick up</a>
+    </nav>
+    <div class="header-tools">
+      <form class="search-form" action="/search" method="get">
+        <label class="visually-hidden" for="q">Search</label>
+        <input id="q" name="q" type="search" placeholder="Search">
+      </form>
+      <a class="icon-btn" href="/cart" aria-label="Basket">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 7h15l-1.4 8.2a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.6L5.2 4H3" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="20" r="1.2" fill="currentColor"/><circle cx="17" cy="20" r="1.2" fill="currentColor"/></svg>
+        <% if (cartCount) { %><span class="basket-count"><%= cartCount %></span><% } %>
+      </a>
+    </div>
+  </div>
+</header>
+<% if (flash) { %><div class="flash"><%= flash %></div><% } %>
+<div class="offcanvas offcanvas-start" tabindex="-1" id="stillMenu" aria-labelledby="stillMenuLabel">
+  <div class="offcanvas-header">
+    <h2 class="offcanvas-title serif" id="stillMenuLabel">Petite Botanicals</h2>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form action="/search" method="get" class="mb-3">
+      <input name="q" type="search" placeholder="Search the still room">
+    </form>
+    <% categories.forEach(function (cat) { %>
+      <a href="/category/<%= cat.slug %>"><%= cat.name %></a>
+    <% }) %>
+    <a href="/shop">All small batches</a>
+    <a href="/about">Our story</a>
+    <a href="/standards">Our standards</a>
+    <a href="/pickup">Delivery & Pick up</a>
+    <a href="/cart">Basket<% if (cartCount) { %> (<%= cartCount %>)<% } %></a>
+  </div>
+</div>

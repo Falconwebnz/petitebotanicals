@@ -1,0 +1,26 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Search</p>
+      <h1><%= q ? q : 'Search the still room' %></h1>
+    </div>
+  </section>
+  <section class="section">
+    <div class="still-wrap">
+      <% if (!q) { %>
+        <div class="empty">Type a name or a note — Aurielle, vetiver, balm.</div>
+      <% } else if (!products.length) { %>
+        <div class="empty">Nothing under “<%= q %>” is on the bench.</div>
+      <% } else { %>
+        <div class="product-grid">
+          <% products.forEach(function (product) { %>
+            <%- include('partials/product-card', { product: product }) %>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

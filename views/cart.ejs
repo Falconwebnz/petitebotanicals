@@ -1,0 +1,56 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Basket</p>
+      <h1>What you are taking home</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:1.5rem;">
+    <div class="still-wrap">
+      <% if (!cart.items.length) { %>
+        <div class="empty">The basket is empty. The perfume drawer is the place to begin.</div>
+        <p style="margin-top:1rem;"><a class="btn-still" href="/category/botanical-perfumes">Botanical perfumes</a></p>
+      <% } else { %>
+        <table class="basket-table">
+          <thead>
+            <tr><th>Piece</th><th>Price</th><th>Qty</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% cart.items.forEach(function (item) { %>
+              <tr>
+                <td>
+                  <a href="/product/<%= item.product.slug %>"><strong><%= item.product.name %></strong></a>
+                  <div class="muted"><%= item.product.size %><% if (item.product.is_starter) { %> · starter<% } %></div>
+                </td>
+                <td><%= nzd(item.lineTotal) %></td>
+                <td>
+                  <form method="post" action="/cart/update">
+                    <input type="hidden" name="id" value="<%= item.product.id %>">
+                    <input name="qty" type="number" min="0" max="12" value="<%= item.qty %>" style="width:70px;">
+                    <button class="btn-line" type="submit" style="margin-top:.4rem;">Update</button>
+                  </form>
+                </td>
+                <td>
+                  <form method="post" action="/cart/remove">
+                    <input type="hidden" name="id" value="<%= item.product.id %>">
+                    <button class="btn-line" type="submit">Remove</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <div class="basket-summary">
+          <p class="eyebrow">Subtotal</p>
+          <p class="buy-price"><%= nzd(cart.subtotal) %></p>
+          <p class="fine">New Zealand dollars. Shipping is collected at Stripe checkout when test keys are set.</p>
+          <p class="fine delivery-quiet"><%= copy.delivery_label %>, or local pickup. <%= copy.lockbox_note %></p>
+          <p style="margin-top:1rem;"><a class="btn-still" href="/checkout">Checkout</a></p>
+        </div>
+      <% } %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

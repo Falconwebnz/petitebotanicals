@@ -1,0 +1,36 @@
+<footer class="site-footer">
+  <div class="still-wrap footer-grid">
+    <div class="footer-brand">
+      <div class="logo-clip"><img src="/images/brand/logo.png" alt=""></div>
+      <h2 class="serif" style="font-size:2rem;margin:0 0 .4rem;">Care, kept simple.</h2>
+      <p>Petite Botanicals is Jen’s small natural skincare and perfume brand in Canterbury, New Zealand. Small batches, plain ingredients, no synthetic fragrance.</p>
+    </div>
+    <div>
+      <h3 class="serif" style="font-size:1.5rem;">The drawers</h3>
+      <ul class="footer-links">
+        <% categories.forEach(function (cat) { %>
+          <li><a href="/category/<%= cat.slug %>"><%= cat.name %></a></li>
+        <% }) %>
+      </ul>
+    </div>
+    <div>
+      <h3 class="serif" style="font-size:1.5rem;">The house</h3>
+      <ul class="footer-links">
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/about">My story</a></li>
+        <li><a href="/cart">Basket</a></li>
+        <li><a href="/admin">Still-room desk</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="still-wrap footer-base">
+    <span>© <%= year %> Petite Botanicals. Canterbury, New Zealand.</span>
+    <span>Prices in NZD. External use. Patch test first.</span>
+  </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="/vendor/js/bootstrap.bundle.js"></script>
+<script src="/vendor/slick/slick.min.js"></script>
+<script src="/js/site.js"></script>
+</body>
+</html>

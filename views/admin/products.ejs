@@ -1,0 +1,42 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main>
+  <%- include('../partials/desk-bar') %>
+  <section class="section" style="padding-top:1.4rem;">
+    <div class="still-wrap">
+      <div style="display:flex;justify-content:space-between;gap:1rem;align-items:end;">
+        <h1 class="serif" style="font-size:3rem;margin:0;">Products</h1>
+        <a class="btn-still" href="/admin/products/new">Add a product</a>
+      </div>
+      <div class="desk-table-wrap" style="overflow-x:auto;">
+        <table class="desk-table">
+          <thead>
+            <tr><th></th><th>Name</th><th>Drawer</th><th>Price</th><th>Flags</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% products.forEach(function (product) { %>
+              <tr>
+                <td><% if (product.image) { %><img class="thumb" src="<%= product.image %>" alt=""><% } %></td>
+                <td><a href="/product/<%= product.slug %>"><%= product.name %></a><div class="muted"><%= product.size %></div></td>
+                <td><%= product.category_name %></td>
+                <td><%= nzd(product.price_cents) %></td>
+                <td>
+                  <% if (product.featured) { %>Featured<br><% } %>
+                  <% if (product.is_starter) { %>Starter<br><% } %>
+                  <%= product.in_stock ? 'In stock' : 'Hidden from sale' %>
+                </td>
+                <td>
+                  <a href="/admin/products/<%= product.id %>/edit">Edit</a>
+                  <form method="post" action="/admin/products/<%= product.id %>/delete" onsubmit="return confirm('Remove this product?');">
+                    <button class="btn-line" type="submit" style="margin-top:.4rem;">Remove</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>
