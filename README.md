@@ -15,13 +15,13 @@ npm install
 npm start
 ```
 
-Open http://localhost:3000
+Open https://petitebotanicals.onrender.com
 
 The SQLite database is created on first start at `data/still-room.sqlite` and seeded from the brand documents. Delete that file and restart to seed again. Uploaded images live in `public/uploads`.
 
 ## Shop desk
 
-http://localhost:3000/admin
+https://petitebotanicals.onrender.com/admin
 
 Dev login, from `.env.example` only:
 
