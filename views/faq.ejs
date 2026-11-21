@@ -1,0 +1,36 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Help</p>
+      <h1>FAQs</h1>
+      <p>Straight answers about the products, how to choose them, and how an order works. Ingredient lists and care notes stay on the product page. These questions explain them.</p>
+    </div>
+  </section>
+  <section class="section faq-page" style="padding-top:2.2rem;">
+    <div class="still-wrap">
+      <nav class="text-tabs faq-jump" aria-label="FAQ groups">
+        <% groups.forEach(function (group) { %>
+          <a class="text-tab" href="#<%= group.id %>"><%= group.title %></a>
+        <% }) %>
+      </nav>
+      <% groups.forEach(function (group) { %>
+        <section class="faq-band" id="<%= group.id %>" aria-labelledby="faq-<%= group.id %>">
+          <h2 id="faq-<%= group.id %>"><%= group.title %></h2>
+          <% if (!group.faqs.length) { %>
+            <p class="faq-empty">FAQs for this group will appear here.</p>
+          <% } else { %>
+            <%- include('partials/faq-list', { faqs: group.faqs, faqName: 'general-' + group.id }) %>
+          <% } %>
+        </section>
+      <% }) %>
+      <%- include('partials/faq-links', { links: [
+        { href: '/glossary', label: 'Glossary', icon: 'leaf' },
+        { href: '/standards', label: 'Our standards', icon: 'seal' },
+        { href: '/returns', label: 'Returns Policy', icon: 'returns' }
+      ] }) %>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

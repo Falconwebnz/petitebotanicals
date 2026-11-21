@@ -1,0 +1,42 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main>
+  <%- include('../partials/desk-bar') %>
+  <section class="section" style="padding-top:1.4rem;">
+    <div class="still-wrap">
+      <h1 class="serif" style="font-size:3rem;">FAQs</h1>
+      <p class="muted">Every public question is edited here. Open a section, then save, add, or remove a line. A blank line starts a new paragraph. A link is written as [Glossary](/glossary).</p>
+      <h2 class="serif" style="font-size:2rem;">General</h2>
+      <% groups.forEach(function (group) { %>
+        <details class="desk-fold" id="<%= group.id %>">
+          <summary><%= group.title %> <span><%= group.faqs.length %></span></summary>
+          <div class="desk-fold-body">
+            <%- include('../partials/faq-editor', { faqs: group.faqs, addAction: '/admin/faqs', returnTo: '/admin/faqs#' + group.id, topic: group.id, uid: group.id, showOnProduct: false }) %>
+          </div>
+        </details>
+      <% }) %>
+      <h2 class="serif" style="font-size:2rem;margin-top:2rem;">Categories</h2>
+      <% cats.forEach(function (cat) { %>
+        <details class="desk-fold" id="cat-<%= cat.id %>">
+          <summary><%= cat.name %> <span><%= cat.faqs.length %></span></summary>
+          <div class="desk-fold-body">
+            <p class="muted">Shown under the products on this category page. Tick a question to repeat it on each product in the category.</p>
+            <%- include('../partials/faq-editor', { faqs: cat.faqs, addAction: '/admin/categories/' + cat.id + '/faqs', returnTo: '/admin/faqs#cat-' + cat.id, topic: '', uid: 'cat-' + cat.id, showOnProduct: true }) %>
+          </div>
+        </details>
+      <% }) %>
+      <h2 class="serif" style="font-size:2rem;margin-top:2rem;">Products</h2>
+      <p class="muted">Use a product question only when the answer is true of that formula and not of the whole category. The same question wording replaces the shared answer on that product page.</p>
+      <% products.forEach(function (product) { %>
+        <details class="desk-fold" id="product-<%= product.id %>">
+          <summary><%= product.name %> <span><%= product.faqs.length %></span></summary>
+          <div class="desk-fold-body">
+            <p class="muted"><%= product.category_name %></p>
+            <%- include('../partials/faq-editor', { faqs: product.faqs, addAction: '/admin/products/' + product.id + '/faqs', returnTo: '/admin/faqs#product-' + product.id, topic: '', uid: 'product-' + product.id, showOnProduct: false }) %>
+          </div>
+        </details>
+      <% }) %>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>

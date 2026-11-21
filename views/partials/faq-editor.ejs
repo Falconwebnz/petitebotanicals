@@ -1,0 +1,46 @@
+<% var back = returnTo; %>
+<% var topicValue = typeof topic === 'undefined' ? '' : topic; %>
+<% var showProduct = typeof showOnProduct !== 'undefined' && showOnProduct; %>
+<% faqs.forEach(function (faq, index) { %>
+  <form class="faq-admin" method="post" action="/admin/faqs/<%= faq.id %>">
+    <input type="hidden" name="return_to" value="<%= back %>">
+    <% if (topicValue) { %><input type="hidden" name="topic" value="<%= topicValue %>"><% } %>
+    <label for="q-<%= faq.id %>">Question</label>
+    <input id="q-<%= faq.id %>" name="question" type="text" value="<%= faq.question %>" required>
+    <label for="a-<%= faq.id %>">Answer</label>
+    <textarea id="a-<%= faq.id %>" name="answer" required><%= faq.answer %></textarea>
+    <% if (showProduct) { %>
+      <label class="check"><input type="checkbox" name="on_product" <%= faq.on_product ? 'checked' : '' %>> Also show on products in this category</label>
+    <% } %>
+    <label for="reviewed-<%= faq.id %>">Last reviewed</label>
+    <input id="reviewed-<%= faq.id %>" name="reviewed_on" type="text" value="<%= faq.reviewed_on || '' %>">
+    <label for="evidence-<%= faq.id %>">Internal note, not published</label>
+    <textarea id="evidence-<%= faq.id %>" name="evidence"><%= faq.evidence || '' %></textarea>
+    <div class="faq-admin-actions">
+      <button class="btn-still" type="submit">Save</button>
+      <% if (index > 0) { %>
+        <button class="btn-line" type="submit" formaction="/admin/faqs/<%= faq.id %>/move" name="direction" value="up">Move up</button>
+      <% } %>
+      <% if (index < faqs.length - 1) { %>
+        <button class="btn-line" type="submit" formaction="/admin/faqs/<%= faq.id %>/move" name="direction" value="down">Move down</button>
+      <% } %>
+      <button class="btn-line" type="submit" formaction="/admin/faqs/<%= faq.id %>/delete">Remove</button>
+    </div>
+  </form>
+<% }) %>
+<form class="faq-admin faq-admin-new" method="post" action="<%= addAction %>">
+  <input type="hidden" name="return_to" value="<%= back %>">
+  <% if (topicValue) { %><input type="hidden" name="topic" value="<%= topicValue %>"><% } %>
+  <label for="new-q-<%= uid %>">New question</label>
+  <input id="new-q-<%= uid %>" name="question" type="text">
+  <label for="new-a-<%= uid %>">Answer</label>
+  <textarea id="new-a-<%= uid %>" name="answer"></textarea>
+  <% if (showProduct) { %>
+    <label class="check"><input type="checkbox" name="on_product"> Also show on products in this category</label>
+  <% } %>
+  <label for="new-reviewed-<%= uid %>">Last reviewed</label>
+  <input id="new-reviewed-<%= uid %>" name="reviewed_on" type="text">
+  <label for="new-evidence-<%= uid %>">Internal note, not published</label>
+  <textarea id="new-evidence-<%= uid %>" name="evidence"></textarea>
+  <p style="margin-top:0.9rem;"><button class="btn-line" type="submit">Add question</button></p>
+</form>

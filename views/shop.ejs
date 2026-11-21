@@ -1,12 +1,13 @@
 <%- include('partials/head') %>
 <%- include('partials/header') %>
 <main>
-  <section class="page-hero plain">
-    <div class="still-wrap">
+  <section class="page-banner">
+    <img class="page-banner-photo page-banner-photo--fern" src="/images/brand/hero-fern.jpg" alt="Woman with a fern across her face" oncontextmenu="return false;">
+    <div class="page-banner-scrim"></div>
+    <div class="still-wrap page-banner-copy">
       <p class="eyebrow">Shop</p>
       <h1>All small batches</h1>
-      <p><%= settings.shop_intro %></p>
-      <p><a href="/about">Read more about my story and standards</a></p>
+      <%- include('partials/prose-blocks', { blocks: contentBlocks(settings.shop_intro) }) %>
     </div>
   </section>
   <section class="section">

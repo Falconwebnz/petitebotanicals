@@ -1,0 +1,3 @@
+<% (parts || []).forEach(function (part) { %>
+<% if (part.type === 'link') { %><a href="<%= part.href %>"<% if (String(part.href).charAt(0) !== '#') { %> target="_blank" rel="noopener<% if (String(part.href).indexOf('http') === 0) { %> noreferrer<% } %>"<% } %>><%= part.value %></a><% } else if (part.type === 'email') { %><a href="mailto:<%= part.value %>"><%= part.value %></a><% } else { %><%= part.value %><% } %>
+<% }) %>

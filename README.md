@@ -1,6 +1,6 @@
-# Petite Botanicals — The Still Room
+# Petite Botanicals
 
-A small-batch shop for Petite Botanicals, Canterbury, New Zealand. The storefront follows the structure of the Glowing Beauty `home-05` template (hero, category entrances, product rail, trust points, maker’s story, footer) and is restyled as an earth-artisan still room: cream paper, botanical green, gold hairlines.
+A small-batch shop for Petite Botanicals, Canterbury, New Zealand. The storefront follows the structure of the Glowing Beauty `home-05` template (hero, category entrances, product rail, trust points, maker’s story, footer) and is restyled in cream paper, botanical green, and gold hairlines.
 
 The original Glowing template is left untouched. This app lives in `petite-botanicals` and copies only the Bootstrap, Slick and theme assets it needs.
 
@@ -19,7 +19,7 @@ Open http://localhost:3000
 
 The SQLite database is created on first start at `data/still-room.sqlite` and seeded from the brand documents. Delete that file and restart to seed again. Uploaded images live in `public/uploads`.
 
-## Still-room desk
+## Shop desk
 
 http://localhost:3000/admin
 
@@ -32,7 +32,7 @@ Change `ADMIN_USER` and `ADMIN_PASSWORD` in `.env` before the first run if you w
 
 From the desk you can:
 
-- Add and edit products (name, one of the four drawers, NZD price, size, descriptions, notes, ingredients, how to use, precautions, image, featured, in stock, starter flag)
+- Add and edit products (name, one of the four categories, NZD price, size, descriptions, notes, ingredients, how to use, precautions, image, featured, in stock, starter flag)
 - Edit the intro and hero image of the four fixed categories
 - Edit the homepage kicker, headline, subhead, story teaser, shop intro and hero image
 
@@ -58,6 +58,6 @@ Finished perfume oils, from the final revised recipes, with selling prices from 
 - Night Solace, 10 ml, NZ$15
 - Latitude 44, 10 ml, NZ$18
 
-Aurielle keeps both the printed label (ingredients, allergens, precautions, certified organic) and the still-room recipe notes, because they differ.
+Aurielle keeps both the printed label (ingredients, allergens, precautions, certified organic) and the recipe notes, because they differ.
 
-Balms and mist sprays are named in the story and target notes but have no finished formula. Room mists are not specified. Those three drawers contain one clearly marked starter card each, with a placeholder price, so they can be replaced in the desk.
+Balms and mist sprays are named in the story and target notes but have no finished formula. Room mists are not specified. Those three categories contain one clearly marked starter card each, with a placeholder price, so they can be replaced in the desk.

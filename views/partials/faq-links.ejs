@@ -1,0 +1,8 @@
+<nav class="faq-more" aria-label="<%= typeof aria !== 'undefined' && aria ? aria : 'Related reading' %>">
+  <% (links || []).forEach(function (link) { %>
+    <a href="<%= link.href %>"<% if (String(link.href).charAt(0) !== '#') { %> target="_blank" rel="noopener"<% } %>>
+      <%- include('link-icon', { icon: link.icon }) %>
+      <span><%= link.label %></span>
+    </a>
+  <% }) %>
+</nav>

@@ -10,7 +10,7 @@
   <section class="section" style="padding-top:1.4rem;">
     <div class="still-wrap" style="max-width:720px;">
       <% if (!cart.items.length) { %>
-        <div class="empty">Nothing to pay for yet. <a href="/shop">Return to the shop</a>.</div>
+        <div class="empty">Nothing to pay for yet. <a href="/shop" target="_blank" rel="noopener">Return to the shop</a>.</div>
       <% } else { %>
         <ul style="padding-left:1.1rem;">
           <% cart.items.forEach(function (item) { %>
@@ -29,39 +29,51 @@
         <% } %>
         <form id="checkout-form" method="post" action="/checkout">
           <div class="fulfilment">
-            <h2 id="arrival-heading" class="fulfil-heading">How the parcel arrives</h2>
-            <input id="fulfil-delivery" type="radio" name="fulfilment" value="delivery" <%= fulfilment === 'pickup' ? '' : 'checked' %>>
-            <label for="fulfil-delivery"><%= copy.delivery_label %></label>
-            <input id="fulfil-pickup" type="radio" name="fulfilment" value="pickup" <%= fulfilment === 'pickup' ? 'checked' : '' %>>
-            <label for="fulfil-pickup">Local pickup</label>
-            <div id="shipping-box" class="fulfil-panel">
-              <label for="shipping_note">Shipping info</label>
-              <p class="fine" id="shipping-prompt"><%= copy.shipping_prompt %></p>
-              <textarea id="shipping_note" name="shipping_note" maxlength="500" aria-describedby="shipping-prompt"><%= shippingNote %></textarea>
-            </div>
-            <div id="pickup-box" class="fulfil-panel">
-              <p class="lockbox-line"><%= copy.lockbox_note %></p>
-              <label for="pickup_note">Pickup note</label>
-              <p class="fine" id="pickup-prompt">Name on the parcel, or a time that suits.</p>
-              <textarea id="pickup_note" name="pickup_note" maxlength="500" aria-describedby="pickup-prompt"><%= pickupNote %></textarea>
-            </div>
+            <% if (localCollection) { %>
+              <h2 id="arrival-heading" class="fulfil-heading">Click and collect</h2>
+              <input type="hidden" name="fulfilment" value="pickup">
+              <div id="pickup-box" class="fulfil-panel is-open">
+                <p class="lockbox-line"><%= copy.lockbox_note %></p>
+                <label for="pickup_note">Collection note</label>
+                <p class="fine" id="pickup-prompt">Name for the lockbox, or a time that suits.</p>
+                <textarea id="pickup_note" name="pickup_note" maxlength="500" aria-describedby="pickup-prompt"><%= pickupNote %></textarea>
+              </div>
+            <% } else { %>
+              <h2 id="arrival-heading" class="fulfil-heading">How the parcel arrives</h2>
+              <input id="fulfil-delivery" type="radio" name="fulfilment" value="delivery" <%= fulfilment === 'pickup' ? '' : 'checked' %>>
+              <label for="fulfil-delivery"><%= copy.delivery_label %></label>
+              <input id="fulfil-pickup" type="radio" name="fulfilment" value="pickup" <%= fulfilment === 'pickup' ? 'checked' : '' %>>
+              <label for="fulfil-pickup">Local pickup</label>
+              <div id="shipping-box" class="fulfil-panel">
+                <label for="shipping_note">Shipping info</label>
+                <p class="fine" id="shipping-prompt"><%= copy.shipping_prompt %></p>
+                <textarea id="shipping_note" name="shipping_note" maxlength="500" aria-describedby="shipping-prompt"><%= shippingNote %></textarea>
+              </div>
+              <div id="pickup-box" class="fulfil-panel">
+                <p class="lockbox-line"><%= copy.lockbox_note %></p>
+                <label for="pickup_note">Pickup note</label>
+                <p class="fine" id="pickup-prompt">Name on the parcel, or a time that suits.</p>
+                <textarea id="pickup_note" name="pickup_note" maxlength="500" aria-describedby="pickup-prompt"><%= pickupNote %></textarea>
+              </div>
+            <% } %>
           </div>
           <button class="btn-still" type="submit" <%= stripeReady ? '' : 'disabled' %>>Continue to Stripe</button>
         </form>
         <p class="fine">Currency is NZD. Stripe is used in test mode. Do not enter a real card.</p>
+        <%- include('partials/policy-links') %>
         <script>
           (function () {
             var delivery = document.getElementById('fulfil-delivery');
             var pickup = document.getElementById('fulfil-pickup');
             var shipping = document.getElementById('shipping_note');
             var pickupNote = document.getElementById('pickup_note');
-            if (!delivery || !pickup || !shipping || !pickupNote) return;
+            if (!pickupNote) return;
             var timer = null;
             function send() {
-              var isPickup = pickup.checked;
+              var isPickup = !delivery || (pickup && pickup.checked);
               var body = new URLSearchParams();
               body.set('fulfilment', isPickup ? 'pickup' : 'delivery');
-              body.set('note', isPickup ? pickupNote.value : shipping.value);
+              body.set('note', isPickup ? pickupNote.value : (shipping ? shipping.value : ''));
               fetch('/checkout/note', {
                 method: 'POST',
                 headers: {
@@ -76,9 +88,9 @@
               window.clearTimeout(timer);
               timer = window.setTimeout(send, 350);
             }
-            delivery.addEventListener('change', queue);
-            pickup.addEventListener('change', queue);
-            shipping.addEventListener('input', queue);
+            if (delivery) delivery.addEventListener('change', queue);
+            if (pickup) pickup.addEventListener('change', queue);
+            if (shipping) shipping.addEventListener('input', queue);
             pickupNote.addEventListener('input', queue);
           })();
         </script>

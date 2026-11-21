@@ -5,8 +5,49 @@
   <section class="section" style="padding-top:1.4rem;">
     <div class="still-wrap" style="max-width:820px;">
       <h1 class="serif" style="font-size:3rem;">Pages</h1>
+      <p class="muted">House pages and the policies customers expect in the footer. Each form saves on its own.</p>
+      <nav class="page-jump" aria-label="Page editors">
+        <a href="#edit-story">Our Story</a>
+        <a href="#edit-contact">Contact</a>
+        <a href="#edit-standards">Our Standards</a>
+        <a href="#edit-pickup">Delivery & Pick up</a>
+        <a href="#edit-glossary">Glossary</a>
+        <a href="#edit-terms">Terms of Use</a>
+        <a href="#edit-privacy">Privacy</a>
+        <a href="#edit-returns">Returns Policy</a>
+      </nav>
 
-      <form class="form-card" method="post" action="/admin/pages/standards">
+      <form class="form-card" id="edit-story" method="post" action="/admin/pages/story">
+        <h2 class="serif" style="margin-top:0;">Our Story</h2>
+        <label for="story_eyebrow">Eyebrow</label>
+        <input id="story_eyebrow" name="story_eyebrow" type="text" value="<%= settings.story_eyebrow || '' %>">
+        <label for="story_headline">Heading</label>
+        <input id="story_headline" name="story_headline" type="text" value="<%= settings.story_headline || '' %>">
+        <label for="story_place">Place</label>
+        <input id="story_place" name="story_place" type="text" value="<%= settings.story_place || '' %>">
+        <label for="story_aside">Side note</label>
+        <input id="story_aside" name="story_aside" type="text" value="<%= settings.story_aside || '' %>">
+        <label for="story_body">Story</label>
+        <textarea id="story_body" name="story_body" style="min-height:360px;"><%= settings.story_body || '' %></textarea>
+        <p class="muted">A line starting with <code>#</code> is a heading. A blank line starts a new paragraph. A line starting with <code>-</code> is a bullet.</p>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Our Story</button>
+          <a class="btn-line" href="/about" target="_blank" rel="noopener">View page</a>
+        </p>
+      </form>
+
+      <form class="form-card" id="edit-contact" method="post" action="/admin/pages/contact">
+        <h2 class="serif" style="margin-top:0;">Contact email</h2>
+        <p class="muted">Notes from the contact page, and the policies, use this address. If it is left blank, the contact page writes to petitebotanicalsnz@gmail.com.</p>
+        <label for="contact_email">Email</label>
+        <input id="contact_email" name="contact_email" type="email" autocomplete="email" value="<%= settings.contact_email || '' %>">
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save email</button>
+          <a class="btn-line" href="/contact" target="_blank" rel="noopener">View page</a>
+        </p>
+      </form>
+
+      <form class="form-card" id="edit-standards" method="post" action="/admin/pages/standards">
         <h2 class="serif" style="margin-top:0;">Our Standards</h2>
         <label for="standards_aside">Side note</label>
         <input id="standards_aside" name="standards_aside" type="text" value="<%= settings.standards_aside || '' %>">
@@ -23,11 +64,14 @@
         <label for="standards_body">Paragraphs</label>
         <textarea id="standards_body" name="standards_body" style="min-height:220px;"><%= settings.standards_body || '' %></textarea>
         <p class="muted">Leave a blank line between paragraphs.</p>
-        <p style="margin-top:1rem;"><button class="btn-still" type="submit">Save Our Standards</button></p>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Our Standards</button>
+          <a class="btn-line" href="/standards" target="_blank" rel="noopener">View page</a>
+        </p>
       </form>
 
-      <form class="form-card" method="post" action="/admin/pages/pickup">
-        <h2 class="serif" style="margin-top:0;">Local pick up Box</h2>
+      <form class="form-card" id="edit-pickup" method="post" action="/admin/pages/pickup">
+        <h2 class="serif" style="margin-top:0;">Delivery & Pick up</h2>
         <label for="pickup_aside">Side note</label>
         <input id="pickup_aside" name="pickup_aside" type="text" value="<%= settings.pickup_aside || '' %>">
         <label for="pickup_lead">Opening line</label>
@@ -35,7 +79,71 @@
         <label for="pickup_body">Paragraphs</label>
         <textarea id="pickup_body" name="pickup_body" style="min-height:160px;"><%= settings.pickup_body || '' %></textarea>
         <p class="muted">Leave a blank line between paragraphs.</p>
-        <p style="margin-top:1rem;"><button class="btn-still" type="submit">Save Local pick up Box</button></p>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Delivery & Pick up</button>
+          <a class="btn-line" href="/pickup" target="_blank" rel="noopener">View page</a>
+        </p>
+      </form>
+
+      <form class="form-card" id="edit-glossary" method="post" action="/admin/pages/glossary">
+        <h2 class="serif" style="margin-top:0;">Glossary</h2>
+        <p class="muted">Plain factual language. Do not write chemical-free. Add an organic or BioGro claim only when that finished product is certified and you can name the certifier. Keep exact percentages and the recipe off this page.</p>
+        <label for="glossary_intro">Opening</label>
+        <textarea id="glossary_intro" name="glossary_intro" style="min-height:160px;"><%= settings.glossary_intro || '' %></textarea>
+        <label for="glossary_entries">Ingredients</label>
+        <textarea id="glossary_entries" name="glossary_entries" style="min-height:320px;"><%= settings.glossary_entries || '' %></textarea>
+        <p class="muted">One ingredient per block, with a blank line between blocks. First line is the name. Next line can be <code>INCI: Aqua (Water)</code>. The remaining lines are the plain-English definition. The page lists them A to Z.</p>
+        <label for="glossary_note">Closing note</label>
+        <textarea id="glossary_note" name="glossary_note"><%= settings.glossary_note || '' %></textarea>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Glossary</button>
+          <a class="btn-line" href="/glossary" target="_blank" rel="noopener">View page</a>
+        </p>
+      </form>
+
+      <p class="muted" id="policy-note">Terms, Privacy and Returns start as generic New Zealand examples. Put the real contact email above, read each page, and have them checked if you are unsure. Rights under the Consumer Guarantees Act 1993 and the Privacy Act 2020 cannot be removed.</p>
+      <p class="muted">In a policy, a line starting with <code>#</code> is a heading. A blank line starts a new paragraph. A line starting with <code>-</code> is a bullet. A link is written <code>[Privacy Commissioner](https://www.privacy.org.nz)</code>. Write <code>{{email}}</code> where the contact email should appear.</p>
+
+      <form class="form-card" id="edit-terms" method="post" action="/admin/pages/terms">
+        <h2 class="serif" style="margin-top:0;">Terms of Use</h2>
+        <label for="terms_updated">Last updated</label>
+        <input id="terms_updated" name="terms_updated" type="text" value="<%= settings.terms_updated || '' %>">
+        <label for="terms_intro">Opening</label>
+        <textarea id="terms_intro" name="terms_intro"><%= settings.terms_intro || '' %></textarea>
+        <label for="terms_body">Sections</label>
+        <textarea id="terms_body" name="terms_body" style="min-height:320px;"><%= settings.terms_body || '' %></textarea>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Terms of Use</button>
+          <a class="btn-line" href="/terms" target="_blank" rel="noopener">View page</a>
+        </p>
+      </form>
+
+      <form class="form-card" id="edit-privacy" method="post" action="/admin/pages/privacy">
+        <h2 class="serif" style="margin-top:0;">Privacy</h2>
+        <label for="privacy_updated">Last updated</label>
+        <input id="privacy_updated" name="privacy_updated" type="text" value="<%= settings.privacy_updated || '' %>">
+        <label for="privacy_intro">Opening</label>
+        <textarea id="privacy_intro" name="privacy_intro"><%= settings.privacy_intro || '' %></textarea>
+        <label for="privacy_body">Sections</label>
+        <textarea id="privacy_body" name="privacy_body" style="min-height:320px;"><%= settings.privacy_body || '' %></textarea>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Privacy</button>
+          <a class="btn-line" href="/privacy" target="_blank" rel="noopener">View page</a>
+        </p>
+      </form>
+
+      <form class="form-card" id="edit-returns" method="post" action="/admin/pages/returns">
+        <h2 class="serif" style="margin-top:0;">Returns Policy</h2>
+        <label for="returns_updated">Last updated</label>
+        <input id="returns_updated" name="returns_updated" type="text" value="<%= settings.returns_updated || '' %>">
+        <label for="returns_intro">Opening</label>
+        <textarea id="returns_intro" name="returns_intro"><%= settings.returns_intro || '' %></textarea>
+        <label for="returns_body">Sections</label>
+        <textarea id="returns_body" name="returns_body" style="min-height:320px;"><%= settings.returns_body || '' %></textarea>
+        <p class="form-actions">
+          <button class="btn-still" type="submit">Save Returns Policy</button>
+          <a class="btn-line" href="/returns" target="_blank" rel="noopener">View page</a>
+        </p>
       </form>
     </div>
   </section>

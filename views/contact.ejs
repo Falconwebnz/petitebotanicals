@@ -1,0 +1,77 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow">Contact</p>
+      <h1>Write to us</h1>
+    </div>
+  </section>
+  <section class="section" style="padding-top:2rem;">
+    <div class="still-wrap contact-layout">
+      <figure class="contact-photo">
+        <img src="/images/brand/tea-in-nature.jpg" alt="A smiling woman sitting in a sunlit meadow, holding a cup of tea" oncontextmenu="return false;">
+      </figure>
+      <div class="contact-card">
+        <% if (sent) { %>
+          <h2>Thank you.</h2>
+          <p>Your note is with us. We read it ourselves and reply by email.</p>
+          <p class="fine">We’ll reply from <a href="mailto:<%= inbox %>"><%= inbox %></a>.</p>
+          <p class="form-actions"><a class="btn-line" href="/contact">Send another note</a></p>
+        <% } else { %>
+          <h2>Send a Note.</h2>
+          <p>An order, a scent, or a pickup in Canterbury — tell us what you need.</p>
+          <p>We reply as soon as possible, and we don’t add you to a list.</p>
+          <% if (limited) { %>
+            <div class="notice" role="alert">
+              <strong>That’s a few notes close together.</strong>
+              <p>Write directly to <a href="mailto:<%= inbox %>"><%= inbox %></a>, or try the form again a little later.</p>
+              <% if (mailto) { %><p class="form-actions"><a class="btn-still" href="<%= mailto %>">Open email</a></p><% } %>
+            </div>
+          <% } else if (sendFailed) { %>
+            <div class="notice" role="alert">
+              <strong>That note didn’t leave the page.</strong>
+              <p>Your email app can send it straight to <a href="mailto:<%= inbox %>"><%= inbox %></a>.</p>
+              <% if (mailto) { %><p class="form-actions"><a class="btn-still" href="<%= mailto %>">Open email</a></p><% } %>
+            </div>
+          <% } %>
+          <form class="contact-form" method="post" action="/contact">
+            <div class="visually-hidden" aria-hidden="true">
+              <label for="company">Company</label>
+              <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <div class="contact-fields">
+              <div>
+                <label for="name">Your name</label>
+                <input id="name" name="name" type="text" autocomplete="name" maxlength="80" required value="<%= note.name %>"<% if (errors.name) { %> aria-invalid="true" aria-describedby="name-error"<% } %>>
+                <% if (errors.name) { %><p class="field-error" id="name-error"><%= errors.name %></p><% } %>
+              </div>
+              <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" maxlength="120" required value="<%= note.email %>"<% if (errors.email) { %> aria-invalid="true" aria-describedby="email-error"<% } %>>
+                <% if (errors.email) { %><p class="field-error" id="email-error"><%= errors.email %></p><% } %>
+              </div>
+              <div class="span-2">
+                <label for="topic">What it’s about</label>
+                <select id="topic" name="topic" required<% if (errors.topic) { %> aria-invalid="true" aria-describedby="topic-error"<% } %>>
+                  <option value="">Choose one</option>
+                  <% topics.forEach(function (item) { %>
+                    <option value="<%= item %>"<%= note.topic === item ? ' selected' : '' %>><%= item %></option>
+                  <% }) %>
+                </select>
+                <% if (errors.topic) { %><p class="field-error" id="topic-error"><%= errors.topic %></p><% } %>
+              </div>
+              <div class="span-2">
+                <label for="message">Your note</label>
+                <textarea id="message" name="message" maxlength="1500" required<% if (errors.message) { %> aria-invalid="true" aria-describedby="message-error"<% } %>><%= note.message %></textarea>
+                <% if (errors.message) { %><p class="field-error" id="message-error"><%= errors.message %></p><% } %>
+              </div>
+            </div>
+            <button class="btn-still" type="submit">Send a note</button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

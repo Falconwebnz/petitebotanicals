@@ -1,0 +1,14 @@
+<div class="faq-list">
+  <% faqs.forEach(function (faq) { %>
+    <details class="faq-item" name="<%= faqName || 'faq' %>">
+      <summary><%= faq.question %></summary>
+      <div class="faq-answer">
+        <% String(faq.answer || '').split(/\n\s*\n/).forEach(function (para) { %>
+          <% if (para.trim()) { %>
+            <p><%- include('rich', { parts: segments(para.trim(), '') }) %></p>
+          <% } %>
+        <% }) %>
+      </div>
+    </details>
+  <% }) %>
+</div>

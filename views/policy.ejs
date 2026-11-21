@@ -1,0 +1,32 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<main>
+  <section class="page-hero plain">
+    <div class="still-wrap">
+      <p class="eyebrow"><%= page.eyebrow %></p>
+      <h1><%= page.title %></h1>
+      <% if (page.updated) { %><p class="policy-meta">Last updated <%= page.updated %>. Written for customers in New Zealand.</p><% } %>
+    </div>
+  </section>
+  <section class="section policy-section">
+    <div class="still-wrap policy-layout">
+      <% if (toc.length > 1) { %>
+        <nav class="policy-toc" aria-label="On this page">
+          <p class="eyebrow">On this page</p>
+          <ol>
+            <% toc.forEach(function (item) { %>
+              <li><a href="#<%= item.id %>"><%= item.text %></a></li>
+            <% }) %>
+          </ol>
+        </nav>
+      <% } %>
+      <article class="policy-prose">
+        <% if (introParts && introParts.length) { %>
+          <p class="policy-lead"><%- include('partials/rich', { parts: introParts }) %></p>
+        <% } %>
+        <%- include('partials/prose-blocks', { blocks: blocks }) %>
+      </article>
+    </div>
+  </section>
+</main>
+<%- include('partials/footer') %>

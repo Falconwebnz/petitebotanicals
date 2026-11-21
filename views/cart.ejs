@@ -10,8 +10,8 @@
   <section class="section" style="padding-top:1.5rem;">
     <div class="still-wrap">
       <% if (!cart.items.length) { %>
-        <div class="empty">The basket is empty. The perfume drawer is the place to begin.</div>
-        <p style="margin-top:1rem;"><a class="btn-still" href="/category/botanical-perfumes">Botanical perfumes</a></p>
+        <div class="empty">The basket is empty.</div>
+        <p style="margin-top:1rem;"><a class="btn-still" href="/shop" target="_blank" rel="noopener">All Products</a></p>
       <% } else { %>
         <table class="basket-table">
           <thead>
@@ -21,14 +21,15 @@
             <% cart.items.forEach(function (item) { %>
               <tr>
                 <td>
-                  <a href="/product/<%= item.product.slug %>"><strong><%= item.product.name %></strong></a>
+                  <a href="/product/<%= item.product.slug %>" target="_blank" rel="noopener"><strong><%= item.product.name %></strong></a>
                   <div class="muted"><%= item.product.size %><% if (item.product.is_starter) { %> · starter<% } %></div>
+                  <%- include('partials/stock-label', { product: item.product }) %>
                 </td>
                 <td><%= nzd(item.lineTotal) %></td>
                 <td>
                   <form method="post" action="/cart/update">
                     <input type="hidden" name="id" value="<%= item.product.id %>">
-                    <input name="qty" type="number" min="0" max="12" value="<%= item.qty %>" style="width:70px;">
+                    <input name="qty" type="number" min="0" max="<%= Number(item.product.launched) ? (Number(item.product.stock) || 0) : 0 %>" value="<%= item.qty %>" style="width:70px;">
                     <button class="btn-line" type="submit" style="margin-top:.4rem;">Update</button>
                   </form>
                 </td>
@@ -45,9 +46,13 @@
         <div class="basket-summary">
           <p class="eyebrow">Subtotal</p>
           <p class="buy-price"><%= nzd(cart.subtotal) %></p>
-          <p class="fine">New Zealand dollars. Shipping is collected at Stripe checkout when test keys are set.</p>
-          <p class="fine delivery-quiet"><%= copy.delivery_label %>, or local pickup. <%= copy.lockbox_note %></p>
-          <p style="margin-top:1rem;"><a class="btn-still" href="/checkout">Checkout</a></p>
+          <p class="fine">New Zealand dollars. Click and collect from the studio lockbox.</p>
+          <p class="fine delivery-quiet"><%= copy.lockbox_note %></p>
+          <% if (stockProblems && stockProblems.length) { %>
+            <div class="notice"><strong>Stock has changed.</strong> <%= stockProblems.join(' ') %> Update the basket before checkout.</div>
+          <% } %>
+          <p style="margin-top:1rem;"><a class="btn-still" href="/checkout" target="_blank" rel="noopener">Checkout</a></p>
+          <%- include('partials/policy-links') %>
         </div>
       <% } %>
     </div>

@@ -1,11 +1,27 @@
 <%- include('partials/head') %>
+<script type="application/ld+json"><%- jsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  description: [product.short_description, product.ingredients].filter(Boolean).join(' '),
+  category: product.category_name,
+  brand: { '@type': 'Brand', name: 'Petite Botanicals' },
+  url: origin + '/product/' + product.slug,
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'NZD',
+    price: (product.price_cents / 100).toFixed(2),
+    availability: product.in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    url: origin + '/product/' + product.slug
+  }
+}) %></script>
 <%- include('partials/header') %>
 <main>
   <div class="still-wrap product-layout">
     <div>
       <div class="figure-frame">
         <% if (product.image) { %>
-          <img src="<%= product.image %>" alt="<%= product.name %>">
+          <img src="<%= product.image %>" alt="<%= product.name %>" oncontextmenu="return false;">
         <% } else { %>
           <div class="plate">
             <span><%= product.category_name %></span>
@@ -24,6 +40,7 @@
         <div class="card-block">
           <h2>Botanicals</h2>
           <div class="pre"><%= product.ingredients %></div>
+          <p class="fine"><a href="/glossary" target="_blank" rel="noopener">Read the glossary</a> for the plain-English names.</p>
         </div>
       <% } %>
       <% if (product.how_to_use) { %>
@@ -36,6 +53,16 @@
         <div class="card-block">
           <h2>Care</h2>
           <div class="pre"><%= product.precautions %></div>
+        </div>
+      <% } %>
+      <% if (faqs && faqs.length) { %>
+        <div class="card-block faq-band faq-band-product">
+          <h2 id="product-faqs">FAQs about this product</h2>
+          <%- include('partials/faq-list', { faqs: faqs, faqName: 'product-' + product.id }) %>
+          <%- include('partials/faq-links', { links: [
+            { href: '/category/' + product.category_slug, label: 'FAQs about this collection', icon: 'collection' },
+            { href: '/faq', label: 'View all FAQs', icon: 'question' }
+          ] }) %>
         </div>
       <% } %>
       <% if (related.length) { %>

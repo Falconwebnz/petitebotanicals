@@ -1,17 +1,29 @@
 <%- include('partials/head') %>
 <%- include('partials/header') %>
 <main>
-  <section class="page-hero <%= category.hero_image ? '' : 'plain' %>" <% if (category.hero_image) { %>style="--hero:url('<%= category.hero_image %>')"<% } %>>
-    <div class="still-wrap">
-      <p class="eyebrow">The Still Room</p>
+  <% if (category.slug === 'balms' || category.slug === 'mist-sprays') { %>
+  <section class="page-banner">
+    <% if (category.slug === 'balms') { %>
+    <img class="page-banner-photo page-banner-photo--balms" src="/images/brand/balms-banner.jpg" alt="Gloved hands filling a jar with cream" oncontextmenu="return false;">
+    <% } else { %>
+    <img class="page-banner-photo page-banner-photo--mist" src="/images/brand/mist-banner.jpg" alt="A woman among green leaves" oncontextmenu="return false;">
+    <% } %>
+    <div class="page-banner-scrim"></div>
+    <div class="still-wrap page-banner-copy">
       <h1><%= category.name %></h1>
-      <p><%= category.intro %></p>
     </div>
   </section>
+  <% } else { %>
+  <section class="page-hero <%= category.hero_image ? '' : 'plain' %>" <% if (category.hero_image) { %>style="--hero:url('<%= category.hero_image %>')"<% } %>>
+    <div class="still-wrap">
+      <h1><%= category.name %></h1>
+    </div>
+  </section>
+  <% } %>
   <section class="section category-products">
     <div class="still-wrap">
       <% if (!products.length) { %>
-        <div class="empty">This drawer is empty. Add a product from the still-room desk when the formula is ready.</div>
+        <div class="empty">This category is empty.</div>
       <% } else { %>
         <div class="product-grid">
           <% products.forEach(function (product) { %>
@@ -21,20 +33,28 @@
       <% } %>
     </div>
   </section>
+  <% if (category.about_title || category.intro) { %>
+  <section class="category-about" aria-labelledby="about-heading">
+    <div class="still-wrap">
+      <% if (category.about_title) { %><h2 id="about-heading"><%= category.about_title %></h2><% } %>
+      <% String(category.intro || '').split(/\n\s*\n/).forEach(function (para) { %>
+        <% if (para.trim()) { %><p><%= para.trim() %></p><% } %>
+      <% }) %>
+    </div>
+  </section>
+  <% } %>
   <section class="faq-band" aria-labelledby="faq-heading">
     <div class="still-wrap">
-      <h2 id="faq-heading">Questions</h2>
+      <h2 id="faq-heading"><%= faqHeading %></h2>
       <% if (!faqs.length) { %>
-        <p class="faq-empty">Questions for this drawer will appear here.</p>
+        <p class="faq-empty">FAQs for this collection will appear here.</p>
       <% } else { %>
-        <div class="faq-list">
-          <% faqs.forEach(function (faq) { %>
-            <details class="faq-item">
-              <summary><%= faq.question %></summary>
-              <div class="faq-answer"><%= faq.answer %></div>
-            </details>
-          <% }) %>
-        </div>
+        <%- include('partials/faq-list', { faqs: faqs, faqName: 'cat-' + category.id }) %>
+        <%- include('partials/faq-links', { links: [
+          { href: '/glossary', label: 'More about our ingredients', icon: 'leaf' },
+          { href: '/standards', label: 'Our standards', icon: 'seal' },
+          { href: '/faq', label: 'View all FAQs', icon: 'question' }
+        ] }) %>
       <% } %>
     </div>
   </section>

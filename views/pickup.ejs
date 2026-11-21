@@ -4,7 +4,7 @@
   <section class="page-hero plain">
     <div class="still-wrap">
       <p class="eyebrow">Arrival</p>
-      <h1>Local pick up Box</h1>
+      <h1>Click & Collect</h1>
     </div>
   </section>
   <section class="section" style="padding-top:2rem;">
@@ -16,10 +16,8 @@
       </div>
       <article>
         <% if (settings.pickup_lead) { %><p><%= settings.pickup_lead %></p><% } %>
-        <% String(settings.pickup_body || '').split(/\n{2,}/).forEach(function (para) { %>
-          <% if (para.trim()) { %><p><%= para.trim() %></p><% } %>
-        <% }) %>
-        <p class="signature">Warm regards,<br>Jen</p>
+        <%- include('partials/prose-blocks', { blocks: contentBlocks(settings.pickup_body) }) %>
+        <div class="text-tabs"><a class="text-tab" href="/returns" target="_blank" rel="noopener">Read the Returns Policy</a></div>
       </article>
     </div>
   </section>

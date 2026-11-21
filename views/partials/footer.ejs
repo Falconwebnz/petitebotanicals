@@ -3,29 +3,41 @@
     <div class="footer-brand">
       <div class="logo-clip"><img src="/images/brand/logo.png" alt=""></div>
       <h2 class="serif" style="font-size:2rem;margin:0 0 .4rem;">Care, kept simple.</h2>
-      <p>Petite Botanicals is Jen’s small natural skincare and perfume brand in Canterbury, New Zealand. Small batches, plain ingredients, no synthetic fragrance.</p>
+      <p>Petite Botanicals is a small natural skincare and perfume brand in Canterbury, New Zealand. Small batches, plain ingredients, no synthetic fragrance. External use. Patch test first.</p>
     </div>
     <div>
-      <h3 class="serif" style="font-size:1.5rem;">The drawers</h3>
+      <h3 class="serif" style="font-size:1.5rem;">Categories</h3>
       <ul class="footer-links">
         <% categories.forEach(function (cat) { %>
-          <li><a href="/category/<%= cat.slug %>"><%= cat.name %></a></li>
+          <li><a href="/category/<%= cat.slug %>" target="_blank" rel="noopener"><%= cat.name %></a></li>
         <% }) %>
       </ul>
     </div>
-    <div>
-      <h3 class="serif" style="font-size:1.5rem;">The house</h3>
+    <nav aria-label="Pages">
+      <h3 class="serif" style="font-size:1.5rem;">Pages</h3>
       <ul class="footer-links">
-        <li><a href="/shop">Shop</a></li>
-        <li><a href="/about">My story</a></li>
-        <li><a href="/cart">Basket</a></li>
-        <li><a href="/admin">Still-room desk</a></li>
+        <li><a href="/shop" target="_blank" rel="noopener"<% if (path === '/shop') { %> aria-current="page"<% } %>>Shop</a></li>
+        <li><a href="/about" target="_blank" rel="noopener"<% if (path === '/about') { %> aria-current="page"<% } %>>Our story</a></li>
+        <li><a href="/contact" target="_blank" rel="noopener"<% if (path === '/contact') { %> aria-current="page"<% } %>>Contact us</a></li>
+        <li><a href="/standards" target="_blank" rel="noopener"<% if (path === '/standards') { %> aria-current="page"<% } %>>Our Standards</a></li>
+        <li><a href="/pickup" target="_blank" rel="noopener"<% if (path === '/pickup') { %> aria-current="page"<% } %>>Click & Collect</a></li>
+        <li><a href="/glossary" target="_blank" rel="noopener"<% if (path === '/glossary') { %> aria-current="page"<% } %>>Glossary</a></li>
+        <li><a href="/faq" target="_blank" rel="noopener"<% if (path === '/faq') { %> aria-current="page"<% } %>>FAQs</a></li>
+        <li><a href="/cart" target="_blank" rel="noopener"<% if (path === '/cart') { %> aria-current="page"<% } %>>Basket</a></li>
       </ul>
-    </div>
+    </nav>
+    <nav aria-label="Policies">
+      <h3 class="serif" style="font-size:1.5rem;">Policies</h3>
+      <ul class="footer-links">
+        <li><a href="/terms" target="_blank" rel="noopener"<% if (path === '/terms') { %> aria-current="page"<% } %>>Terms of Use</a></li>
+        <li><a href="/privacy" target="_blank" rel="noopener"<% if (path === '/privacy') { %> aria-current="page"<% } %>>Privacy</a></li>
+        <li><a href="/returns" target="_blank" rel="noopener"<% if (path === '/returns') { %> aria-current="page"<% } %>>Returns Policy</a></li>
+      </ul>
+    </nav>
   </div>
   <div class="still-wrap footer-base">
     <span>© <%= year %> Petite Botanicals. Canterbury, New Zealand.</span>
-    <span>Prices in NZD. External use. Patch test first.</span>
+    <span>Prices in NZD.</span>
   </div>
 </footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

@@ -2,7 +2,7 @@
   "name": "petite-botanicals",
   "version": "1.0.0",
   "private": true,
-  "description": "The Still Room — Petite Botanicals storefront and still-room desk.",
+  "description": "Petite Botanicals storefront and shop desk.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

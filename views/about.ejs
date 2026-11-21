@@ -1,48 +1,27 @@
 <%- include('partials/head') %>
 <%- include('partials/header') %>
 <main>
-  <section class="page-hero plain">
-    <div class="still-wrap">
-      <p class="eyebrow">My story</p>
-      <h1>Kia ora, I’m Jen.</h1>
+  <section class="page-banner">
+    <img class="page-banner-photo page-banner-photo--story" src="/images/brand/story-coast.jpg" alt="A stony Canterbury beach beside a pale cliff and the sea" oncontextmenu="return false;">
+    <div class="page-banner-scrim"></div>
+    <div class="still-wrap page-banner-copy">
+      <% if (settings.story_eyebrow) { %><p class="eyebrow"><%= settings.story_eyebrow %></p><% } %>
+      <h1><%= settings.story_headline || 'Our Story' %></h1>
     </div>
+    <p class="place-ref">Gore Bay, North Canterbury</p>
   </section>
   <section class="section" style="padding-top:2rem;">
     <div class="still-wrap about-layout">
       <div class="story-mark">
         <div class="logo-clip"><img src="/images/brand/logo.png" alt="Petite Botanicals logo"></div>
-        <p>Canterbury, New Zealand</p>
-        <p class="muted">The meadow photograph is atmosphere for the house, not a portrait.</p>
+        <% if (settings.story_place) { %><p><%= settings.story_place %></p><% } %>
+        <% if (settings.story_aside) { %><p class="muted"><%= settings.story_aside %></p><% } %>
+        <div class="story-photo-frame">
+          <img src="/images/brand/story-falls.jpg" alt="A fern-lined waterfall in a New Zealand forest" oncontextmenu="return false;">
+        </div>
       </div>
       <article>
-        <p>Petite Botanicals is my small natural skincare and perfume brand, based in Canterbury, New Zealand.</p>
-        <p>I have very fair, sensitive skin, so I’ve always been careful about what I use on my body. As a parent, I’ve become even more mindful about the chemicals we’re routinely exposed to in everyday products. When I started looking for magnesium sprays, perfumes and balms that were truly natural, well documented and gentle enough for daily use, I kept hitting compromises.</p>
-        <p>That’s when I decided to formulate my own.</p>
-
-        <h2>What I won’t compromise on</h2>
-        <p>For me, there are three non-negotiables in every product:</p>
-        <ul>
-          <li>Truly natural, non-toxic formulations</li>
-          <li>High-quality, well-documented ingredients (certified organic essential oils wherever possible, with IFRA/allergen statements and COA/GC-MS where available)</li>
-          <li>Gentle enough for sensitive skin (all citrus oils, including bergamot, are the safe, leave-on-friendly type)</li>
-        </ul>
-        <p>There are no synthetic fragrances, no harsh preservatives and no unnecessary additives. Everything is made in small batches in Canterbury, with careful attention to ingredient ratios and skin tolerance.</p>
-        <p>I’m naturally cautious and evidence-minded; I’d rather spend months getting a formula right than rush something out. Over the last six months, I’ve researched suppliers, tested formulas and set up systems for consistent, compliant production. A small local team supports me with production and fulfilment during busy periods, so quality and turnaround stay reliable.</p>
-
-        <h2>Quality without the luxury markup</h2>
-        <p>You’ll see natural perfumes, body sprays and balms sold at much higher prices. I’ve chosen to keep pricing accessible so these products can be used daily, not saved for special occasions.</p>
-        <p>That’s possible because I invest in quality ingredients and documentation, not fancy packaging or big marketing budgets, and because I run a lean, small-batch operation and pass those savings on instead of adding a luxury markup.</p>
-        <p>The result is a range that is high quality, transparent and fairly priced.</p>
-
-        <h2>Who these products are for</h2>
-        <p>These products are for people who:</p>
-        <ul>
-          <li>Want natural, non-toxic skincare and scent without compromising on quality.</li>
-          <li>Have sensitive or reactive skin and need to be mindful of what they use.</li>
-          <li>Appreciate transparency — knowing exactly what’s in a product and why it’s there.</li>
-          <li>Want simple, natural products that feel good to use every day.</li>
-        </ul>
-        <p class="signature">Warm regards,<br>Jen</p>
+        <%- include('partials/prose-blocks', { blocks: blocks, marks: true }) %>
       </article>
     </div>
   </section>

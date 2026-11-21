@@ -4,21 +4,45 @@
   <section class="page-hero plain">
     <div class="still-wrap">
       <p class="eyebrow">Search</p>
-      <h1><%= q ? q : 'Search the still room' %></h1>
+      <h1><%= q ? q : 'Search' %></h1>
     </div>
   </section>
   <section class="section">
     <div class="still-wrap">
       <% if (!q) { %>
-        <div class="empty">Type a name or a note — Aurielle, vetiver, balm.</div>
-      <% } else if (!products.length) { %>
-        <div class="empty">Nothing under “<%= q %>” is on the bench.</div>
+        <div class="empty">Search a product, a collection, or an ingredient — jojoba, vetiver, balm.</div>
+      <% } else if (!products.length && !terms.length) { %>
+        <div class="empty">Nothing under “<%= q %>” is in the products or the glossary.</div>
       <% } else { %>
-        <div class="product-grid">
-          <% products.forEach(function (product) { %>
-            <%- include('partials/product-card', { product: product }) %>
-          <% }) %>
-        </div>
+        <% if (products.length) { %>
+          <section class="search-block" aria-labelledby="search-products">
+            <h2 id="search-products">Products</h2>
+            <div class="product-grid">
+              <% products.forEach(function (product) { %>
+                <div>
+                  <%- include('partials/product-card', { product: product }) %>
+                  <% if (product.match && product.match !== 'the name') { %>
+                    <p class="search-why">Found in <%= product.match %></p>
+                  <% } %>
+                </div>
+              <% }) %>
+            </div>
+          </section>
+        <% } %>
+        <% if (terms.length) { %>
+          <section class="search-block" aria-labelledby="search-glossary">
+            <h2 id="search-glossary">Glossary</h2>
+            <ul class="search-terms">
+              <% terms.forEach(function (entry) { %>
+                <li>
+                  <a href="/glossary#<%= entry.id %>" target="_blank" rel="noopener"><%= entry.term %></a>
+                  <% if (entry.inci) { %><p class="inci">INCI · <%= entry.inci %></p><% } %>
+                  <% if (entry.snippet) { %><p><%= entry.snippet %></p><% } %>
+                </li>
+              <% }) %>
+            </ul>
+          </section>
+        <% } %>
       <% } %>
     </div>
   </section>

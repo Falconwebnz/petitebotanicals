@@ -1,7 +1,7 @@
 <article class="batch-card">
-  <a class="batch-visual" href="/product/<%= product.slug %>">
+  <a class="batch-visual" href="/product/<%= product.slug %>" target="_blank" rel="noopener">
     <% if (product.image) { %>
-      <img src="<%= product.image %>" alt="<%= product.name %>">
+      <img src="<%= product.image %>" alt="<%= product.name %>" oncontextmenu="return false;">
     <% } else { %>
       <div class="plate">
         <span><%= product.category_name %></span>
@@ -11,9 +11,10 @@
   </a>
   <div class="batch-body">
     <% if (product.is_starter) { %><span class="starter-flag">Starter</span><% } %>
+    <%- include('stock-label', { product: product }) %>
     <div class="batch-cat"><%= product.category_name %></div>
-    <h3><a href="/product/<%= product.slug %>"><%= product.name %></a></h3>
-    <p class="price"><%= nzd(product.price_cents) %><% if (product.size) { %> · <%= product.size %><% } %></p>
-    <p class="muted"><%= product.short_description %></p>
+    <h3><a href="/product/<%= product.slug %>" target="_blank" rel="noopener"><%= product.name %></a></h3>
+    <p class="price"><%= nzd(product.price_cents) %><% if (product.size) { %><span class="price-size"> · <%= product.size %></span><% } %></p>
+    <% if (product.short_description) { %><p class="batch-blurb"><%= product.short_description %></p><% } %>
   </div>
 </article>

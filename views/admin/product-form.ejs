@@ -8,7 +8,7 @@
       <form class="form-card" method="post" action="<%= action %>" enctype="multipart/form-data">
         <label for="name">Name</label>
         <input id="name" name="name" type="text" required value="<%= product.name %>">
-        <label for="category_id">Drawer</label>
+        <label for="category_id">Category</label>
         <select id="category_id" name="category_id">
           <% categories.forEach(function (cat) { %>
             <option value="<%= cat.id %>" <%= Number(product.category_id) === Number(cat.id) ? 'selected' : '' %>><%= cat.name %></option>
@@ -33,11 +33,26 @@
         <label for="image">Image</label>
         <% if (product.image) { %><p><img src="<%= product.image %>" alt="" style="max-height:140px;"></p><% } %>
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        <label for="stock">Stock on hand</label>
+        <input id="stock" name="stock" type="number" min="0" step="1" required value="<%= Number(product.stock) || 0 %>" style="max-width:8rem;">
+        <% if (product.launched) { %>
+          <p class="muted">Live on the shop. Above 0 shows In-Stock. Less than 1 shows OUT OF STOCK.</p>
+        <% } else { %>
+          <p class="muted">Held in the desk until you launch it. The shop shows OUT OF STOCK until then.</p>
+        <% } %>
         <label class="check"><input type="checkbox" name="featured" <%= product.featured ? 'checked' : '' %>> Featured on the homepage</label>
-        <label class="check"><input type="checkbox" name="in_stock" <%= product.in_stock ? 'checked' : '' %>> In stock</label>
         <label class="check"><input type="checkbox" name="is_starter" <%= product.is_starter ? 'checked' : '' %>> Starter card (show the replace-before-selling note)</label>
         <p style="margin-top:1.2rem;"><button class="btn-still" type="submit">Save</button></p>
       </form>
+      <% if (product.id && !product.launched) { %>
+        <form method="post" action="/admin/products/<%= product.id %>/launch">
+          <button class="btn-still" type="submit">Launch on the shop</button>
+          <p class="muted">Uses the stock on hand you last saved. Above 0 then shows In-Stock.</p>
+        </form>
+      <% } %>
+      <% if (product.id) { %>
+        <p class="muted" id="questions"><a href="/admin/faqs#product-<%= product.id %>">Edit FAQs for this product</a></p>
+      <% } %>
     </div>
   </section>
 </main>

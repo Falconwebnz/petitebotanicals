@@ -1,0 +1,5 @@
+<% if (Number(product.launched) && (Number(product.stock) || 0) > 0) { %>
+  <p class="stock-flag in">In-Stock</p>
+<% } else { %>
+  <p class="stock-flag out">OUT OF STOCK</p>
+<% } %>

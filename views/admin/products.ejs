@@ -11,19 +11,29 @@
       <div class="desk-table-wrap" style="overflow-x:auto;">
         <table class="desk-table">
           <thead>
-            <tr><th></th><th>Name</th><th>Drawer</th><th>Price</th><th>Flags</th><th></th></tr>
+            <tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Flags</th><th></th></tr>
           </thead>
           <tbody>
             <% products.forEach(function (product) { %>
               <tr>
                 <td><% if (product.image) { %><img class="thumb" src="<%= product.image %>" alt=""><% } %></td>
-                <td><a href="/product/<%= product.slug %>"><%= product.name %></a><div class="muted"><%= product.size %></div></td>
+                <td><a href="/product/<%= product.slug %>" target="_blank" rel="noopener"><%= product.name %></a><div class="muted"><%= product.size %></div></td>
                 <td><%= product.category_name %></td>
                 <td><%= nzd(product.price_cents) %></td>
                 <td>
+                  <%= Number(product.stock) || 0 %> on hand
+                  <% if (product.launched) { %>
+                    <div><%- include('../partials/stock-label', { product: product }) %></div>
+                  <% } else { %>
+                    <p class="stock-flag wait">Not launched</p>
+                    <form method="post" action="/admin/products/<%= product.id %>/launch">
+                      <button class="btn-line" type="submit">Launch</button>
+                    </form>
+                  <% } %>
+                </td>
+                <td>
                   <% if (product.featured) { %>Featured<br><% } %>
-                  <% if (product.is_starter) { %>Starter<br><% } %>
-                  <%= product.in_stock ? 'In stock' : 'Hidden from sale' %>
+                  <% if (product.is_starter) { %>Starter<% } %>
                 </td>
                 <td>
                   <a href="/admin/products/<%= product.id %>/edit">Edit</a>

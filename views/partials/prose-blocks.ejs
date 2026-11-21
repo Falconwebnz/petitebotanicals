@@ -1,0 +1,23 @@
+<% (blocks || []).forEach(function (block, i) { %>
+  <% if (block.type === 'h2') { %>
+    <h2 id="<%= block.id %>"><%= block.text %></h2>
+  <% } else if (block.type === 'ul') { %>
+    <ul>
+      <% block.items.forEach(function (item) { %>
+        <li><%- include('rich', { parts: item }) %></li>
+      <% }) %>
+    </ul>
+    <% if (typeof marks !== 'undefined' && marks) { %>
+      <% var showsMarks = block.items.some(function (item) {
+        return item.some(function (part) { return part.value && String(part.value).indexOf('IFRA') !== -1; });
+      }); %>
+      <% if (showsMarks) { %><%- include('standard-marks') %><% } %>
+    <% } %>
+  <% } else if (block.type === 'button') { %>
+    <% if (!blocks[i - 1] || blocks[i - 1].type !== 'button') { %><div class="text-tabs"><% } %>
+    <a class="text-tab" href="<%= block.href %>" target="_blank" rel="noopener"><%= block.text %></a>
+    <% if (!blocks[i + 1] || blocks[i + 1].type !== 'button') { %></div><% } %>
+  <% } else { %>
+    <p<% if (typeof lead !== 'undefined' && lead && i === 0) { %> class="policy-lead"<% } %>><%- include('rich', { parts: block.parts }) %></p>
+  <% } %>
+<% }) %>
