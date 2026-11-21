@@ -12,7 +12,9 @@ const { REVIEWED, FAQ_TOPICS, CATEGORY_FAQS, PRODUCT_FAQS, GENERAL_FAQS, categor
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+const publicUrl = process.env.PUBLIC_URL || process.env.RENDER_EXTERNAL_URL || '';
 
+app.set('trust proxy', 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: false, limit: '1mb' }));
@@ -32,7 +34,7 @@ app.use(
     secret: process.env.SESSION_SECRET || 'still-room-dev-secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { httpOnly: true, sameSite: 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 },
+    cookie: { httpOnly: true, sameSite: 'lax', secure: 'auto', maxAge: 7 * 24 * 60 * 60 * 1000 },
   })
 );
 
@@ -1067,7 +1069,7 @@ app.post('/checkout', async (req, res) => {
   }
   try {
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-    const origin = process.env.PUBLIC_URL || req.protocol + '://' + req.get('host');
+    const origin = publicUrl || req.protocol + '://' + req.get('host');
     const sessionParams = {
       mode: 'payment',
       currency: 'nzd',
@@ -1705,7 +1707,7 @@ db.init()
     ensureProductMockups();
     ensureFaqs();
     ensureLocalCollection();
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       const pruneTimer = setInterval(function pruneSessions() {
         const now = Date.now();
         Object.keys(sessionStore.sessions || {}).forEach((sid) => {
@@ -1719,7 +1721,7 @@ db.init()
         });
       }, 15 * 60 * 1000);
       if (pruneTimer.unref) pruneTimer.unref();
-      console.log('Petite Botanicals at http://localhost:' + PORT);
+      console.log('Petite Botanicals at ' + (publicUrl || 'http://localhost:' + PORT));
     });
   })
   .catch((err) => {

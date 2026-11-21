@@ -15,6 +15,9 @@
         <div class="logo-clip"><img src="/images/brand/logo.png" alt="Petite Botanicals logo"></div>
         <p>Canterbury, New Zealand</p>
         <p class="muted"><%= settings.standards_aside || '' %></p>
+        <div class="story-photo-frame">
+          <img class="story-photo--peak" src="/images/brand/story-peak.jpg" alt="A snow-covered mountain above a stony river" oncontextmenu="return false;">
+        </div>
       </div>
       <article>
         <% if (settings.standards_intro) { %><p><%= settings.standards_intro %></p><% } %>
@@ -26,7 +29,6 @@
         <%- include('partials/standard-marks', { showImages: false }) %>
         <% if (settings.standards_heading) { %><h2><%= settings.standards_heading %></h2><% } %>
         <%- include('partials/prose-blocks', { blocks: contentBlocks(settings.standards_body) }) %>
-        <p class="signature">Petite Botanicals</p>
       </article>
     </div>
   </section>
