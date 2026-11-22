@@ -151,7 +151,7 @@ function cartLines(sessionCart) {
   let subtotal = 0;
   for (const line of sessionCart || []) {
     const product = db.get('SELECT * FROM products WHERE id = ?', [line.id]);
-    if (!product) continue;
+    if (!product || !Number(product.launched)) continue;
     const qty = Math.min(99, Math.max(1, Math.floor(Number(line.qty) || 1)));
     const lineTotal = product.price_cents * qty;
     subtotal += lineTotal;
@@ -167,7 +167,8 @@ function tidySessionCart(session) {
     const id = Number(line && line.id);
     const qty = Math.min(99, Math.max(0, Math.floor(Number(line && line.qty) || 0)));
     if (!id || qty < 1) return;
-    if (!db.get('SELECT id FROM products WHERE id = ?', [id])) return;
+    const row = db.get('SELECT id, launched FROM products WHERE id = ?', [id]);
+    if (!row || !Number(row.launched)) return;
     next.push({ id, qty });
   });
   const prev = session.cart;
@@ -596,10 +597,10 @@ app.get('/', (req, res) => {
   const featured = db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
-     WHERE p.featured = 1 ORDER BY c.sort_order, p.id`
+     WHERE p.featured = 1 AND p.launched = 1 ORDER BY c.sort_order, p.id`
   );
   const cats = categories().map((cat) => {
-    const count = db.get('SELECT COUNT(*) AS n FROM products WHERE category_id = ?', [cat.id]);
+    const count = db.get('SELECT COUNT(*) AS n FROM products WHERE category_id = ? AND launched = 1', [cat.id]);
     const video = COLLECTION_VIDEOS[cat.slug] || '';
     return Object.assign({}, cat, {
       count: count.n,
@@ -621,6 +622,7 @@ app.get('/shop', (req, res) => {
   const products = db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
+     WHERE p.launched = 1
      ORDER BY c.sort_order, p.id`
   );
   res.render('shop', { title: 'Shop', settings, products });
@@ -660,9 +662,10 @@ app.get('/search', (req, res) => {
     ? db.all(
         `SELECT p.*, c.name AS category_name, c.slug AS category_slug
          FROM products p JOIN categories c ON c.id = p.category_id
-         WHERE p.name LIKE ? OR p.short_description LIKE ? OR p.long_description LIKE ?
+         WHERE p.launched = 1 AND (
+            p.name LIKE ? OR p.short_description LIKE ? OR p.long_description LIKE ?
             OR p.notes LIKE ? OR p.ingredients LIKE ? OR p.how_to_use LIKE ?
-            OR p.precautions LIKE ? OR p.size LIKE ? OR c.name LIKE ?
+            OR p.precautions LIKE ? OR p.size LIKE ? OR c.name LIKE ?)
          ORDER BY CASE WHEN p.name LIKE ? THEN 0 ELSE 1 END, p.name`,
         [like, like, like, like, like, like, like, like, like, like]
       ).map((product) => Object.assign(product, { match: productMatch(product, q) }))
@@ -709,7 +712,7 @@ app.get('/sitemap.xml', (req, res) => {
   const origin = req.protocol + '://' + req.get('host');
   const paths = ['/', '/shop', '/about', '/contact', '/standards', '/glossary', '/faq', '/pickup', '/returns', '/privacy', '/terms'];
   categories().forEach((cat) => paths.push('/category/' + cat.slug));
-  db.all('SELECT slug FROM products ORDER BY id').forEach((product) => paths.push('/product/' + product.slug));
+  db.all('SELECT slug FROM products WHERE launched = 1 ORDER BY id').forEach((product) => paths.push('/product/' + product.slug));
   const xml = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -720,11 +723,11 @@ app.get('/sitemap.xml', (req, res) => {
 
 app.get('/category/:slug', (req, res) => {
   const category = db.get('SELECT * FROM categories WHERE slug = ?', [req.params.slug]);
-  if (!category) return res.status(404).render('missing', { title: 'Not found' });
+  if (!category) return res.status(404).render('missing', { title: 'Not found', status: 404 });
   const products = db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
-     WHERE p.category_id = ? ORDER BY p.is_starter, p.id`,
+     WHERE p.category_id = ? AND p.launched = 1 ORDER BY p.is_starter, p.id`,
     [category.id]
   );
   const faqs = db.all(
@@ -741,11 +744,11 @@ app.get('/product/:slug', (req, res) => {
      WHERE p.slug = ?`,
     [req.params.slug]
   );
-  if (!product) return res.status(404).render('missing', { title: 'Not found' });
+  if (!product || !Number(product.launched)) return res.status(404).render('missing', { title: 'Not found', status: 404 });
   const related = db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
-     WHERE p.category_id = ? AND p.id != ? ORDER BY p.id LIMIT 3`,
+     WHERE p.category_id = ? AND p.id != ? AND p.launched = 1 ORDER BY p.id LIMIT 3`,
     [product.category_id, product.id]
   );
   const description = [product.name, product.category_name, product.short_description, product.ingredients]
@@ -978,8 +981,12 @@ app.get('/returns', (req, res) => {
 
 app.post('/cart/add', (req, res) => {
   const product = db.get('SELECT * FROM products WHERE id = ?', [Number(req.body.id)]);
+  if (!product || !Number(product.launched)) {
+    req.session.flash = 'That piece is not on the shop.';
+    return res.redirect(sameSitePath(req, '/shop'));
+  }
   const available = stockOf(product);
-  if (!product || available < 1) {
+  if (available < 1) {
     req.session.flash = 'That piece is out of stock.';
     return res.redirect(sameSitePath(req, '/shop'));
   }
@@ -1260,7 +1267,7 @@ app.post('/admin/products', requireAdmin, (req, res) => {
 
 app.get('/admin/products/:id/edit', requireAdmin, (req, res) => {
   const product = db.get('SELECT * FROM products WHERE id = ?', [Number(req.params.id)]);
-  if (!product) return res.status(404).render('missing', { title: 'Not found' });
+  if (!product) return res.status(404).render('missing', { title: 'Not found', status: 404 });
   res.render('admin/product-form', {
     title: 'Edit ' + product.name,
     product,
@@ -1327,6 +1334,17 @@ app.post('/admin/products/:id/launch', requireAdmin, (req, res) => {
   req.session.flash = stock > 0
     ? product.name + ' is on the shop, In-Stock.'
     : product.name + ' is on the shop and shows OUT OF STOCK until stock on hand is above 0.';
+  const referer = String(req.get('referer') || '');
+  res.redirect(referer.includes('/edit') ? '/admin/products/' + id + '/edit' : '/admin/products');
+});
+
+app.post('/admin/products/:id/unlaunch', requireAdmin, (req, res) => {
+  const id = Number(req.params.id);
+  const product = db.get('SELECT id, name, stock FROM products WHERE id = ?', [id]);
+  if (!product) return res.redirect('/admin/products');
+  db.run('UPDATE products SET launched = 0, in_stock = 0 WHERE id = ?', [id]);
+  db.save();
+  req.session.flash = product.name + ' is back in the desk. Stock on hand is unchanged, and it is off the shop until you launch it again.';
   const referer = String(req.get('referer') || '');
   res.redirect(referer.includes('/edit') ? '/admin/products/' + id + '/edit' : '/admin/products');
 });
