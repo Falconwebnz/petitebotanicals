@@ -38,7 +38,7 @@
         <% if (product.launched) { %>
           <p class="muted">Live on the shop. Above 0 shows In-Stock. Less than 1 shows OUT OF STOCK.</p>
         <% } else { %>
-          <p class="muted">Held in the desk until you launch it. The shop shows OUT OF STOCK until then.</p>
+          <p class="muted">Held in the desk until you launch it. It stays off the shop until then.</p>
         <% } %>
         <label class="check"><input type="checkbox" name="featured" <%= product.featured ? 'checked' : '' %>> Featured on the homepage</label>
         <label class="check"><input type="checkbox" name="is_starter" <%= product.is_starter ? 'checked' : '' %>> Starter card (show the replace-before-selling note)</label>
@@ -48,6 +48,12 @@
         <form method="post" action="/admin/products/<%= product.id %>/launch">
           <button class="btn-still" type="submit">Launch on the shop</button>
           <p class="muted">Uses the stock on hand you last saved. Above 0 then shows In-Stock.</p>
+        </form>
+      <% } %>
+      <% if (product.id && product.launched) { %>
+        <form method="post" action="/admin/products/<%= product.id %>/unlaunch">
+          <button class="btn-line" type="submit">Return to desk</button>
+          <p class="muted">Takes this product off the shop and keeps the row, stock, and notes here so you can launch it again. This does not delete it.</p>
         </form>
       <% } %>
       <% if (product.id) { %>
