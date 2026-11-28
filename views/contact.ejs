@@ -12,7 +12,12 @@
         <img src="/images/brand/tea-in-nature.jpg" alt="A smiling woman sitting in a sunlit meadow, holding a cup of tea" oncontextmenu="return false;">
       </figure>
       <div class="contact-card">
-        <% if (sent) { %>
+        <% if (sent && testimonialSent) { %>
+          <h2>Thank you.</h2>
+          <p>We’ll read your words. If they fit, we’ll add them under Loved by Customers, with your name.</p>
+          <p class="fine">It does not appear on the homepage until we’ve read it.</p>
+          <p class="form-actions"><a class="btn-line" href="/contact">Send another note</a></p>
+        <% } else if (sent) { %>
           <h2>Thank you.</h2>
           <p>Your note is with us. We read it ourselves and reply by email.</p>
           <p class="fine">We’ll reply from <a href="mailto:<%= inbox %>"><%= inbox %></a>.</p>
@@ -59,9 +64,17 @@
                 </select>
                 <% if (errors.topic) { %><p class="field-error" id="topic-error"><%= errors.topic %></p><% } %>
               </div>
+              <div class="span-2 testimonial-permit" data-testimonial-extra<% if (note.topic !== 'A testimonial') { %> hidden<% } %>>
+                <p>Write the words you’d like us to show under Loved by Customers. We read each note first, and we only add it if you’re happy for your name to appear with it.</p>
+                <label class="check" for="permit">
+                  <input id="permit" name="permit" type="checkbox"<% if (note.permit) { %> checked<% } %><% if (errors.permit) { %> aria-invalid="true" aria-describedby="permit-error"<% } %>>
+                  I’m happy for these words and my name to appear on the homepage.
+                </label>
+                <% if (errors.permit) { %><p class="field-error" id="permit-error"><%= errors.permit %></p><% } %>
+              </div>
               <div class="span-2">
                 <label for="message">Your note</label>
-                <textarea id="message" name="message" maxlength="1500" required<% if (errors.message) { %> aria-invalid="true" aria-describedby="message-error"<% } %>><%= note.message %></textarea>
+                <textarea id="message" name="message" maxlength="<%= note.topic === 'A testimonial' ? 600 : 1500 %>" required<% if (note.topic === 'A testimonial') { %> placeholder="The words you’d like us to show."<% } %><% if (errors.message) { %> aria-invalid="true" aria-describedby="message-error"<% } %>><%= note.message %></textarea>
                 <% if (errors.message) { %><p class="field-error" id="message-error"><%= errors.message %></p><% } %>
               </div>
             </div>

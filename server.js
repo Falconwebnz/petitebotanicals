@@ -941,7 +941,8 @@ app.get('/pickup', (req, res) => {
   res.render('pickup', { title: 'Click & Collect', settings: ensurePageCopy() });
 });
 
-const CONTACT_TOPICS = ['An order', 'A product or scent', 'Local collection', 'Something else'];
+const CONTACT_TOPICS = ['An order', 'A product or scent', 'Local collection', 'A testimonial', 'Something else'];
+const TESTIMONIAL_TOPIC = 'A testimonial';
 const contactHits = new Map();
 
 function contactInbox() {
@@ -952,7 +953,7 @@ function contactInbox() {
 }
 
 function blankNote() {
-  return { name: '', email: '', topic: '', message: '' };
+  return { name: '', email: '', topic: '', message: '', permit: false };
 }
 
 function readContact(body) {
@@ -960,12 +961,28 @@ function readContact(body) {
   const email = String(body.email || '').replace(/\s+/g, '').trim().slice(0, 120);
   const topic = CONTACT_TOPICS.includes(body.topic) ? body.topic : '';
   const message = String(body.message || '').trim().slice(0, 1500);
+  const permit = body.permit === 'on' || body.permit === 'yes';
+  const testimonial = topic === TESTIMONIAL_TOPIC;
   const errors = {};
   if (name.length < 2) errors.name = 'Please add your name.';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = 'Please add an email we can reply to.';
   if (!topic) errors.topic = 'Choose what the note is about.';
-  if (message.length < 8) errors.message = 'Write a short note so we know how to help.';
-  return { name, email, topic, message, errors, honey: String(body.company || '').trim() };
+  if (message.length < 8) {
+    errors.message = testimonial ? 'Write the words you’d like us to show.' : 'Write a short note so we know how to help.';
+  } else if (testimonial && message.length > 600) {
+    errors.message = 'Keep a homepage note to 600 characters.';
+  }
+  if (testimonial && !permit) errors.permit = 'Tick this if you’re happy for us to show your words and your name.';
+  return { name, email, topic, message, permit, errors, honey: String(body.company || '').trim() };
+}
+
+function saveTestimonialDraft(note) {
+  const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
+  db.run(
+    'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, 0, 0, ?, ?)',
+    [note.message.slice(0, 600), note.name, '', Number(max.m) + 1, new Date().toISOString()]
+  );
+  db.save();
 }
 
 function contactMailto(note, inbox) {
@@ -1004,6 +1021,7 @@ function renderContact(res, extras) {
         inbox: contactInbox(),
         topics: CONTACT_TOPICS,
         sent: false,
+        testimonialSent: false,
         sendFailed: false,
         limited: false,
         note: blankNote(),
@@ -1042,7 +1060,7 @@ async function deliverContact(note, inbox, origin) {
 }
 
 app.get('/contact', (req, res) => {
-  renderContact(res, { sent: req.query.sent === '1' });
+  renderContact(res, { sent: req.query.sent === '1', testimonialSent: req.query.note === 'testimonial' });
 });
 
 app.post('/contact', async (req, res) => {
@@ -1054,11 +1072,15 @@ app.post('/contact', async (req, res) => {
     return renderContact(res, { note, limited: true, mailto: contactMailto(note, inbox) });
   }
   rememberNote(req.ip);
+  const testimonial = note.topic === TESTIMONIAL_TOPIC;
+  if (testimonial) saveTestimonialDraft(note);
+  const thanks = testimonial ? '/contact?sent=1&note=testimonial' : '/contact?sent=1';
   try {
-    if (await deliverContact(note, inbox, req.protocol + '://' + req.get('host'))) return res.redirect('/contact?sent=1');
+    if (await deliverContact(note, inbox, req.protocol + '://' + req.get('host'))) return res.redirect(thanks);
   } catch (err) {
     /* The mail handoff failed. The page offers the same note in the visitor's email app. */
   }
+  if (testimonial) return res.redirect(thanks);
   renderContact(res, { note, sendFailed: true, mailto: contactMailto(note, inbox) });
 });
 
