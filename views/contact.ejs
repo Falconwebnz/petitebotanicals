@@ -80,6 +80,14 @@
                   <input id="town" name="town" type="text" maxlength="80" value="<%= note.town %>" placeholder="For example, Rangiora"<% if (errors.town) { %> aria-invalid="true" aria-describedby="town-error"<% } %>>
                   <% if (errors.town) { %><p class="field-error" id="town-error"><%= errors.town %></p><% } %>
                 </div>
+                <label for="testimonial-product">Which product is this about?</label>
+                <select id="testimonial-product" name="product"<% if (errors.product) { %> aria-invalid="true" aria-describedby="product-error"<% } %>>
+                  <option value="">Not a specific product</option>
+                  <% products.forEach(function (item) { %>
+                    <option value="<%= item %>"<%= note.product === item ? ' selected' : '' %>><%= item %></option>
+                  <% }) %>
+                </select>
+                <% if (errors.product) { %><p class="field-error" id="product-error"><%= errors.product %></p><% } %>
               </div>
               <div class="span-2">
                 <label for="message">Your note</label>
