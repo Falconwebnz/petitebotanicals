@@ -1,6 +1,7 @@
 <%- include('partials/head') %>
 <%- include('partials/header') %>
 <main>
+  <% var heroImage = liveImage(category.hero_image); %>
   <% if (category.slug === 'balms' || category.slug === 'mist-sprays') { %>
   <section class="page-banner">
     <% if (category.slug === 'balms') { %>
@@ -14,12 +15,21 @@
     </div>
   </section>
   <% } else { %>
-  <section class="page-hero <%= category.hero_image ? '' : 'plain' %>" <% if (category.hero_image) { %>style="--hero:url('<%= category.hero_image %>')"<% } %>>
+  <section class="page-hero <%= heroImage ? '' : 'plain' %>" <% if (heroImage) { %>style="--hero:url('<%= heroImage %>')"<% } %>>
     <div class="still-wrap">
       <h1><%= category.name %></h1>
     </div>
   </section>
   <% } %>
+  <% if (comingSoon) { %>
+  <section class="section coming-soon" aria-labelledby="coming-soon-heading">
+    <div class="still-wrap coming-soon-card">
+      <h2 id="coming-soon-heading">Coming Soon</h2>
+      <p>This collection is being finished in small batches. In the meantime, have a look at what’s ready now.</p>
+      <div class="text-tabs"><a class="text-tab" href="/shop" target="_blank" rel="noopener">Shop the collection</a></div>
+    </div>
+  </section>
+  <% } else { %>
   <section class="section category-products">
     <div class="still-wrap">
       <% if (!products.length) { %>
@@ -33,12 +43,22 @@
       <% } %>
     </div>
   </section>
-  <% if (category.about_title || category.intro) { %>
+  <% if (category.about_title || aboutBlocks.length) { %>
   <section class="category-about" aria-labelledby="about-heading">
     <div class="still-wrap">
       <% if (category.about_title) { %><h2 id="about-heading"><%= category.about_title %></h2><% } %>
-      <% String(category.intro || '').split(/\n\s*\n/).forEach(function (para) { %>
-        <% if (para.trim()) { %><p><%= para.trim() %></p><% } %>
+      <% aboutBlocks.forEach(function (block) { %>
+        <% if (block.type === 'h3') { %>
+          <h3><%= block.text %></h3>
+        <% } else if (block.type === 'ul') { %>
+          <ul>
+            <% block.items.forEach(function (item) { %>
+              <li><%- include('partials/rich', { parts: item }) %></li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p><%- include('partials/rich', { parts: block.parts }) %></p>
+        <% } %>
       <% }) %>
     </div>
   </section>
@@ -58,5 +78,6 @@
       <% } %>
     </div>
   </section>
+  <% } %>
 </main>
 <%- include('partials/footer') %>

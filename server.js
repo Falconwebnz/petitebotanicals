@@ -1,12 +1,13 @@
 require('dotenv').config();
 
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const db = require('./lib/db');
-const { PAGE_COPY, PAGE_GROUPS, segments, parsePolicy, parseGlossary, groupGlossary } = require('./lib/page-copy');
+const { PAGE_COPY, PAGE_GROUPS, segments, parsePolicy, aboutBlocks, parseGlossary, groupGlossary } = require('./lib/page-copy');
 const { MOCK_POOLS } = require('./lib/seed');
 const { REVIEWED, FAQ_TOPICS, CATEGORY_FAQS, PRODUCT_FAQS, GENERAL_FAQS, categoryHeading } = require('./lib/faq-copy');
 
@@ -25,6 +26,15 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-store');
   next();
+});
+
+app.get('/media/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const row = Number.isInteger(id) && id > 0 ? db.get('SELECT mime, data FROM media WHERE id = ?', [id]) : null;
+  if (!row || row.data == null) return res.status(404).end();
+  res.set('Cache-Control', 'public, max-age=31536000, immutable');
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.type(row.mime || 'application/octet-stream').send(Buffer.from(row.data));
 });
 
 const sessionStore = new session.MemoryStore();
@@ -149,9 +159,10 @@ function readStock(value) {
 function cartLines(sessionCart) {
   const items = [];
   let subtotal = 0;
+  const hidden = sessionCart && sessionCart.length ? hiddenCategoryIds() : new Set();
   for (const line of sessionCart || []) {
     const product = db.get('SELECT * FROM products WHERE id = ?', [line.id]);
-    if (!product || !Number(product.launched)) continue;
+    if (!product || !Number(product.launched) || hidden.has(Number(product.category_id))) continue;
     const qty = Math.min(99, Math.max(1, Math.floor(Number(line.qty) || 1)));
     const lineTotal = product.price_cents * qty;
     subtotal += lineTotal;
@@ -163,12 +174,13 @@ function cartLines(sessionCart) {
 function tidySessionCart(session) {
   if (!session || !Array.isArray(session.cart)) return;
   const next = [];
+  const hidden = session.cart.length ? hiddenCategoryIds() : new Set();
   session.cart.slice(0, 40).forEach((line) => {
     const id = Number(line && line.id);
     const qty = Math.min(99, Math.max(0, Math.floor(Number(line && line.qty) || 0)));
     if (!id || qty < 1) return;
-    const row = db.get('SELECT id, launched FROM products WHERE id = ?', [id]);
-    if (!row || !Number(row.launched)) return;
+    const row = db.get('SELECT id, launched, category_id FROM products WHERE id = ?', [id]);
+    if (!row || !Number(row.launched) || hidden.has(Number(row.category_id))) return;
     next.push({ id, qty });
   });
   const prev = session.cart;
@@ -499,21 +511,34 @@ function checkoutLocals(cart, opts) {
   };
 }
 
+// Render's disk is wiped on every deploy and restart, so uploads live in the database.
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, path.join(__dirname, 'public', 'uploads')),
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname || '').toLowerCase();
-      const safe = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext) ? ext : '.jpg';
-      cb(null, Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + safe);
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 6 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (/^image\/(jpeg|png|webp|gif)$/.test(file.mimetype)) cb(null, true);
     else cb(new Error('Use a JPG, PNG, WEBP or GIF image.'));
   },
 });
+
+function storeUpload(file) {
+  if (!file || !file.buffer || !file.buffer.length) return '';
+  const id = db.run('INSERT INTO media (mime, data, created_at) VALUES (?, ?, ?)', [
+    file.mimetype,
+    new Uint8Array(file.buffer),
+    new Date().toISOString(),
+  ]);
+  db.save();
+  return id ? '/media/' + id : '';
+}
+
+const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
+
+function liveImage(src) {
+  const value = String(src || '');
+  if (!value.startsWith('/uploads/')) return value;
+  return fs.existsSync(path.join(UPLOADS_DIR, path.basename(value))) ? value : '';
+}
 
 const MENU_SAMPLES = {
   'botanical-perfumes': '/images/mockups/perfume-dropper.jpg',
@@ -523,8 +548,74 @@ const MENU_SAMPLES = {
 };
 
 function menuImageFor(cat, settings) {
-  const saved = settings && settings['menu_image_' + cat.slug];
+  const saved = liveImage(settings && settings['menu_image_' + cat.slug]);
   return saved || MENU_SAMPLES[cat.slug] || '/images/brand/meadow.jpg';
+}
+
+const COMING_SOON_DEFAULTS = ['botanical-perfumes'];
+
+function ensureComingSoon() {
+  let changed = false;
+  COMING_SOON_DEFAULTS.forEach((slug) => {
+    const name = 'coming_soon_' + slug;
+    if (db.get('SELECT name FROM settings WHERE name = ?', [name])) return;
+    db.run('INSERT INTO settings (name, value) VALUES (?, ?)', [name, '1']);
+    changed = true;
+  });
+  if (changed) db.save();
+}
+
+function isComingSoon(cat, settings) {
+  if (!cat) return false;
+  return String((settings || settingsMap())['coming_soon_' + cat.slug] || '') === '1';
+}
+
+function hiddenCategoryIds(settings) {
+  const s = settings || settingsMap();
+  return new Set(categories().filter((cat) => isComingSoon(cat, s)).map((cat) => Number(cat.id)));
+}
+
+function onSale(rows, settings) {
+  const hidden = hiddenCategoryIds(settings);
+  return rows.filter((row) => !hidden.has(Number(row.category_id)));
+}
+
+const BALMS_ABOUT_OPENING = 'Small-batch botanical balms for lips, hands, body and everyday skin care.';
+
+const BALMS_ABOUT = `Small-batch balms for lips, hands and body, made in Canterbury with no synthetic fragrance.
+
+# Lip balms
+Pure Lip Balm keeps it simple: no colour, no flavour and no scent.
+
+Rosy Beet and Ruby Beet lip balms are unflavoured and unscented too, with a tint from organic beetroot powder. Rosy Beet gives a light, sheer colour. Ruby Beet is deeper, if you like a bit more.
+
+# Balms for body and hands
+Foot Balm is a rich, water-free hemp seed balm with rose geranium, peppermint and a little ylang ylang. Use it on dry feet, hands, elbows and knees.
+
+Gardener’s Balm and our unscented Soothing Balm are all-rounders for everyday skin care. Rub a little in wherever skin feels dry or tight.
+
+# Magnesium rubs
+Rosemary & Frankincense Magnesium Rub is a smooth massage cream for legs, feet, shoulders and hands, with peppermint and copaiba.
+
+Fragrance-Free Magnesium Rub is a smooth, unscented massage cream for anyone who would rather skip the scent.
+
+# How they’re made
+Every balm and rub is made in small batches in Canterbury. We use well-documented ingredients, organic where we can, and no synthetic fragrance.
+
+They come in glass jars. When yours is empty, please reuse or recycle it.
+
+# Care and use
+For external use only. Keep away from the eyes, and stop using it if your skin becomes irritated. Keep out of reach of children and pets.
+
+These are cosmetic body-care products, not medical treatments.`;
+
+function ensureBalmsAbout() {
+  const row = db.get('SELECT id, intro FROM categories WHERE slug = ?', ['balms']);
+  if (!row) return;
+  const intro = String(row.intro || '').trim();
+  if (!intro.startsWith(BALMS_ABOUT_OPENING) || /^#\s/m.test(intro)) return;
+  db.run('UPDATE categories SET intro = ? WHERE id = ?', [BALMS_ABOUT, row.id]);
+  db.save();
 }
 
 app.use((req, res, next) => {
@@ -535,6 +626,8 @@ app.use((req, res, next) => {
   res.locals.categories = categories();
   res.locals.settings = settingsMap();
   res.locals.menuImageFor = menuImageFor;
+  res.locals.liveImage = liveImage;
+  res.locals.isComingSoon = (cat) => isComingSoon(cat, res.locals.settings);
   res.locals.nzd = nzd;
   res.locals.path = req.path;
   res.locals.admin = !!req.session.admin;
@@ -567,7 +660,7 @@ function productFields(body, file, existing) {
     ingredients: String(body.ingredients || '').trim(),
     how_to_use: String(body.how_to_use || '').trim(),
     precautions: String(body.precautions || '').trim(),
-    image: file ? '/uploads/' + file.filename : existing ? existing.image : '',
+    image: file ? storeUpload(file) : existing ? existing.image : '',
     featured: body.featured ? 1 : 0,
     stock: readStock(body.stock),
     launched: existing && Number(existing.launched) ? 1 : 0,
@@ -594,19 +687,21 @@ const HOME_COLLECTION_LINES = {
 
 app.get('/', (req, res) => {
   const settings = settingsMap();
-  const featured = db.all(
+  const featured = onSale(db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
      WHERE p.featured = 1 AND p.launched = 1 ORDER BY c.sort_order, p.id`
-  );
+  ), settings);
   const cats = categories().map((cat) => {
     const count = db.get('SELECT COUNT(*) AS n FROM products WHERE category_id = ? AND launched = 1', [cat.id]);
     const video = COLLECTION_VIDEOS[cat.slug] || '';
+    const comingSoon = isComingSoon(cat, settings);
     return Object.assign({}, cat, {
       count: count.n,
       video,
       videoType: video.endsWith('.mov') ? 'video/quicktime' : 'video/mp4',
-      line: HOME_COLLECTION_LINES[cat.slug] || '',
+      line: comingSoon ? 'Coming soon.' : HOME_COLLECTION_LINES[cat.slug] || '',
+      comingSoon,
     });
   });
   cats.sort((a, b) => {
@@ -619,12 +714,12 @@ app.get('/', (req, res) => {
 
 app.get('/shop', (req, res) => {
   const settings = settingsMap();
-  const products = db.all(
+  const products = onSale(db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
      WHERE p.launched = 1
      ORDER BY c.sort_order, p.id`
-  );
+  ), settings);
   res.render('shop', { title: 'Shop', settings, products });
 });
 
@@ -659,7 +754,7 @@ app.get('/search', (req, res) => {
   const q = String(req.query.q || '').trim().slice(0, 80);
   const like = '%' + q.replace(/[%_]/g, '') + '%';
   const products = q
-    ? db.all(
+    ? onSale(db.all(
         `SELECT p.*, c.name AS category_name, c.slug AS category_slug
          FROM products p JOIN categories c ON c.id = p.category_id
          WHERE p.launched = 1 AND (
@@ -668,7 +763,7 @@ app.get('/search', (req, res) => {
             OR p.precautions LIKE ? OR p.size LIKE ? OR c.name LIKE ?)
          ORDER BY CASE WHEN p.name LIKE ? THEN 0 ELSE 1 END, p.name`,
         [like, like, like, like, like, like, like, like, like, like]
-      ).map((product) => Object.assign(product, { match: productMatch(product, q) }))
+      )).map((product) => Object.assign(product, { match: productMatch(product, q) }))
     : [];
   const needle = q.toLowerCase();
   const terms = q
@@ -712,7 +807,7 @@ app.get('/sitemap.xml', (req, res) => {
   const origin = req.protocol + '://' + req.get('host');
   const paths = ['/', '/shop', '/about', '/contact', '/standards', '/glossary', '/faq', '/pickup', '/returns', '/privacy', '/terms'];
   categories().forEach((cat) => paths.push('/category/' + cat.slug));
-  db.all('SELECT slug FROM products WHERE launched = 1 ORDER BY id').forEach((product) => paths.push('/product/' + product.slug));
+  onSale(db.all('SELECT slug, category_id FROM products WHERE launched = 1 ORDER BY id')).forEach((product) => paths.push('/product/' + product.slug));
   const xml = (value) => String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const body = [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -734,7 +829,16 @@ app.get('/category/:slug', (req, res) => {
     'SELECT * FROM faqs WHERE category_id = ? AND product_id IS NULL ORDER BY sort_order, id',
     [category.id]
   );
-  res.render('category', { title: category.name, category, products, faqs, faqHeading: categoryHeading(category) });
+  const comingSoon = isComingSoon(category);
+  res.render('category', {
+    title: category.name,
+    category,
+    comingSoon,
+    products: comingSoon ? [] : products,
+    faqs: comingSoon ? [] : faqs,
+    aboutBlocks: comingSoon ? [] : aboutBlocks(category.intro),
+    faqHeading: categoryHeading(category),
+  });
 });
 
 app.get('/product/:slug', (req, res) => {
@@ -745,6 +849,7 @@ app.get('/product/:slug', (req, res) => {
     [req.params.slug]
   );
   if (!product || !Number(product.launched)) return res.status(404).render('missing', { title: 'Not found', status: 404 });
+  if (hiddenCategoryIds().has(Number(product.category_id))) return res.redirect('/category/' + product.category_slug);
   const related = db.all(
     `SELECT p.*, c.name AS category_name, c.slug AS category_slug
      FROM products p JOIN categories c ON c.id = p.category_id
@@ -981,7 +1086,7 @@ app.get('/returns', (req, res) => {
 
 app.post('/cart/add', (req, res) => {
   const product = db.get('SELECT * FROM products WHERE id = ?', [Number(req.body.id)]);
-  if (!product || !Number(product.launched)) {
+  if (!product || !Number(product.launched) || hiddenCategoryIds().has(Number(product.category_id))) {
     req.session.flash = 'That piece is not on the shop.';
     return res.redirect(sameSitePath(req, '/shop'));
   }
@@ -1462,13 +1567,20 @@ app.post('/admin/categories/:id', requireAdmin, (req, res) => {
       req.session.flash = err.message;
       return res.redirect('/admin/categories');
     }
-    const hero = req.file ? '/uploads/' + req.file.filename : existing.hero_image;
+    const hero = req.file ? storeUpload(req.file) : existing.hero_image;
     db.run('UPDATE categories SET about_title = ?, intro = ?, hero_image = ? WHERE id = ?', [
       String(req.body.about_title || '').trim(),
       String(req.body.intro || '').trim(),
       hero,
       id,
     ]);
+    const soonName = 'coming_soon_' + existing.slug;
+    const soonValue = req.body.coming_soon ? '1' : '0';
+    if (db.get('SELECT name FROM settings WHERE name = ?', [soonName])) {
+      db.run('UPDATE settings SET value = ? WHERE name = ?', [soonValue, soonName]);
+    } else {
+      db.run('INSERT INTO settings (name, value) VALUES (?, ?)', [soonName, soonValue]);
+    }
     db.save();
     req.session.flash = existing.name + ' updated.';
     res.redirect('/admin/categories');
@@ -1625,12 +1737,12 @@ app.post('/admin/homepage', requireAdmin, (req, res) => {
       delivery_label: String(req.body.delivery_label || '').trim() || current.delivery_label || DELIVERY_COPY.delivery_label,
       shipping_prompt: String(req.body.shipping_prompt || '').trim() || current.shipping_prompt || DELIVERY_COPY.shipping_prompt,
       lockbox_note: String(req.body.lockbox_note || '').trim() || current.lockbox_note || DELIVERY_COPY.lockbox_note,
-      hero_image: heroFile ? '/uploads/' + heroFile.filename : current.hero_image || '',
+      hero_image: heroFile ? storeUpload(heroFile) : current.hero_image || '',
     };
     categories().forEach((cat) => {
       const field = 'menu_image_' + cat.slug;
       const file = files[field] && files[field][0];
-      next[field] = file ? '/uploads/' + file.filename : current[field] || '';
+      next[field] = file ? storeUpload(file) : current[field] || '';
     });
     Object.keys(next).forEach((name) => {
       const existing = db.get('SELECT name FROM settings WHERE name = ?', [name]);
@@ -1713,6 +1825,8 @@ app.use((err, req, res, next) => {
   res.locals.admin = !!res.locals.admin;
   res.locals.flash = res.locals.flash || null;
   res.locals.menuImageFor = res.locals.menuImageFor || function () { return '/images/brand/logo.png'; };
+  res.locals.liveImage = res.locals.liveImage || liveImage;
+  res.locals.isComingSoon = res.locals.isComingSoon || function () { return false; };
   res.status(500).render('missing', { title: 'Something went wrong', status: 500 }, function (renderErr, html) {
     if (renderErr) return res.status(500).type('text').send('Something went wrong.');
     res.send(html);
@@ -1725,6 +1839,8 @@ db.init()
     ensureProductMockups();
     ensureFaqs();
     ensureLocalCollection();
+    ensureComingSoon();
+    ensureBalmsAbout();
     app.listen(PORT, '0.0.0.0', () => {
       const pruneTimer = setInterval(function pruneSessions() {
         const now = Date.now();

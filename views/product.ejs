@@ -20,8 +20,8 @@
   <div class="still-wrap product-layout">
     <div>
       <div class="figure-frame">
-        <% if (product.image) { %>
-          <img src="<%= product.image %>" alt="<%= product.name %>" oncontextmenu="return false;">
+        <% if (liveImage(product.image)) { %>
+          <img src="<%= liveImage(product.image) %>" alt="<%= product.name %>" oncontextmenu="return false;">
         <% } else { %>
           <div class="plate">
             <span><%= product.category_name %></span>

@@ -31,7 +31,7 @@
         <label for="precautions">Precautions</label>
         <textarea id="precautions" name="precautions"><%= product.precautions || '' %></textarea>
         <label for="image">Image</label>
-        <% if (product.image) { %><p><img src="<%= product.image %>" alt="" style="max-height:140px;"></p><% } %>
+        <% if (product.image && !liveImage(product.image)) { %><p class="starter-note">The saved image is missing from the server. Upload it again.</p><% } else if (product.image) { %><p><img src="<%= product.image %>" alt="" style="max-height:140px;"></p><% } %>
         <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
         <label for="stock">Stock on hand</label>
         <input id="stock" name="stock" type="number" min="0" step="1" required value="<%= Number(product.stock) || 0 %>" style="max-width:8rem;">

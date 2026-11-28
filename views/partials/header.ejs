@@ -16,7 +16,7 @@
         <div class="nav-drop-panel nav-mega" id="shop-menu">
           <div class="mega-links">
             <% categories.forEach(function (cat) { %>
-              <a class="<%= path.indexOf('/category/' + cat.slug) === 0 ? 'active' : '' %>" href="/category/<%= cat.slug %>" target="_blank" rel="noopener"><%= cat.slug === 'botanical-perfumes' ? cat.name.replace('Botanical ', '') : cat.name %></a>
+              <a class="<%= path.indexOf('/category/' + cat.slug) === 0 ? 'active' : '' %>" href="/category/<%= cat.slug %>" target="_blank" rel="noopener"><%= cat.slug === 'botanical-perfumes' ? cat.name.replace('Botanical ', '') : cat.name %><% if (isComingSoon(cat)) { %> <span class="soon-tag">Coming soon</span><% } %></a>
             <% }) %>
             <a href="/shop" target="_blank" rel="noopener">All products</a>
           </div>
@@ -24,13 +24,15 @@
             <% categories.forEach(function (cat) { %>
               <a class="mega-card" href="/category/<%= cat.slug %>" target="_blank" rel="noopener">
                 <img src="<%= menuImageFor(cat, settings) %>" alt="<%= cat.name %>" oncontextmenu="return false;">
-                <span><%= cat.slug === 'botanical-perfumes' ? cat.name.replace('Botanical ', '') : cat.name %></span>
+                <span><%= cat.slug === 'botanical-perfumes' ? cat.name.replace('Botanical ', '') : cat.name %><% if (isComingSoon(cat)) { %> · Coming soon<% } %></span>
               </a>
             <% }) %>
           </div>
         </div>
       </div>
       <a class="<%= path === '/about' ? 'active' : '' %>" href="/about" target="_blank" rel="noopener">Our Story</a>
+      <a class="<%= path === '/standards' ? 'active' : '' %>" href="/standards" target="_blank" rel="noopener">Our Standards</a>
+      <a class="<%= path === '/pickup' ? 'active' : '' %>" href="/pickup" target="_blank" rel="noopener">Click &amp; Collect</a>
       <a class="<%= path === '/contact' ? 'active' : '' %>" href="/contact" target="_blank" rel="noopener">Contact us</a>
     </nav>
     <div class="header-tools">
@@ -56,10 +58,12 @@
       <input name="q" type="search" placeholder="Products and ingredients" aria-label="Search" value="<%= typeof q !== 'undefined' ? q : '' %>">
     </form>
     <% categories.forEach(function (cat) { %>
-      <a href="/category/<%= cat.slug %>" target="_blank" rel="noopener"><%= cat.name %></a>
+      <a href="/category/<%= cat.slug %>" target="_blank" rel="noopener"><%= cat.name %><% if (isComingSoon(cat)) { %> <span class="soon-tag">Coming soon</span><% } %></a>
     <% }) %>
     <a href="/shop" target="_blank" rel="noopener">All small batches</a>
     <a href="/about" target="_blank" rel="noopener">Our story</a>
+    <a href="/standards" target="_blank" rel="noopener">Our Standards</a>
+    <a href="/pickup" target="_blank" rel="noopener">Click &amp; Collect</a>
     <a href="/contact" target="_blank" rel="noopener">Contact us</a>
     <a href="/cart" target="_blank" rel="noopener">Basket<% if (cartCount) { %> (<%= cartCount %>)<% } %></a>
   </div>
