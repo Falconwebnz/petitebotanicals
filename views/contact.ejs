@@ -63,6 +63,9 @@
                   <% }) %>
                 </select>
                 <% if (errors.topic) { %><p class="field-error" id="topic-error"><%= errors.topic %></p><% } %>
+                <div class="collection-note" data-collection-note<% if (note.topic !== 'Local collection') { %> hidden<% } %>>
+                  <p>Read <a href="/pickup" target="_blank" rel="noopener">Click &amp; Collect</a> for how local collection works.</p>
+                </div>
               </div>
               <div class="span-2 testimonial-permit" data-testimonial-extra<% if (note.topic !== 'A testimonial') { %> hidden<% } %>>
                 <p>Write the words you’d like us to show under Loved by Customers. We read each note first, and we only add it if you’re happy for your name to appear with it.</p>

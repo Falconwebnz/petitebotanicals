@@ -938,7 +938,7 @@ app.get('/standards', (req, res) => {
 });
 
 app.get('/pickup', (req, res) => {
-  res.render('pickup', { title: 'Click & Collect', settings: ensurePageCopy() });
+  res.render('pickup', { title: 'Click & Collect', settings: ensurePageCopy(), localCollection: LOCAL_COLLECTION_ONLY });
 });
 
 const CONTACT_TOPICS = ['An order', 'A product or scent', 'Local collection', 'A testimonial', 'Something else'];
@@ -1066,7 +1066,12 @@ async function deliverContact(note, inbox, origin) {
 }
 
 app.get('/contact', (req, res) => {
-  renderContact(res, { sent: req.query.sent === '1', testimonialSent: req.query.note === 'testimonial' });
+  const chosen = req.query.topic === 'Local collection' ? 'Local collection' : '';
+  renderContact(res, {
+    sent: req.query.sent === '1',
+    testimonialSent: req.query.note === 'testimonial',
+    note: chosen ? Object.assign(blankNote(), { topic: chosen }) : blankNote(),
+  });
 });
 
 app.post('/contact', async (req, res) => {

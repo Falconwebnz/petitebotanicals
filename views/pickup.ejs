@@ -15,8 +15,10 @@
         <p class="muted"><%= settings.pickup_aside || '' %></p>
       </div>
       <article>
+        <% if (localCollection) { %><p>There is no national delivery just yet, so collecting your order saves the shipping charge.</p><% } %>
         <% if (settings.pickup_lead) { %><p><%= settings.pickup_lead %></p><% } %>
         <%- include('partials/prose-blocks', { blocks: contentBlocks(settings.pickup_body) }) %>
+        <p>To ask about a collection, use the <a href="/contact?topic=Local%20collection">contact form</a>.</p>
         <div class="text-tabs"><a class="text-tab" href="/returns" target="_blank" rel="noopener">Read the Returns Policy</a></div>
       </article>
     </div>
