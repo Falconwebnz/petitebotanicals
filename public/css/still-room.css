@@ -1990,8 +1990,9 @@ textarea { min-height: 110px; }
   border-color: var(--rose);
 }
 .contact-form textarea { min-height: 150px; }
-.collection-note.text-tabs { margin-top: 0.85rem; }
+.collection-note { margin-top: 0.75rem; }
 .collection-note[hidden] { display: none; }
+.collection-note p { margin: 0; color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; }
 .testimonial-permit[hidden] { display: none; }
 .testimonial-permit p { margin: 0.35rem 0 0.75rem; color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; }
 .testimonial-permit .check + .check { margin-top: 0.7rem; }
