@@ -273,6 +273,7 @@
     var townBox = document.querySelector('#show-town');
     var townField = document.querySelector('[data-town-field]');
     var townInput = townField ? townField.querySelector('input') : null;
+    var collection = document.querySelector('[data-collection-note]');
     function applyTown() {
       var show = topic.value === 'A testimonial' && townBox && townBox.checked;
       if (townField) townField.hidden = !show;
@@ -281,6 +282,7 @@
     function apply() {
       var on = topic.value === 'A testimonial';
       extra.hidden = !on;
+      if (collection) collection.hidden = topic.value !== 'Local collection';
       if (box) box.required = on;
       message.maxLength = on ? 600 : 1500;
       message.placeholder = on ? 'The words you’d like us to show.' : '';
