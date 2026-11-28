@@ -4,13 +4,12 @@
   <section class="page-hero plain">
     <div class="still-wrap">
       <p class="eyebrow">Basket</p>
-      <h1>What you are taking home</h1>
+      <h1><% if (!cart.items.length) { %>Your basket is empty—discover something lovely.<% } else { %>What you are taking home<% } %></h1>
     </div>
   </section>
   <section class="section" style="padding-top:1.5rem;">
     <div class="still-wrap">
       <% if (!cart.items.length) { %>
-        <div class="empty">The basket is empty.</div>
         <p style="margin-top:1rem;"><a class="btn-still" href="/shop" target="_blank" rel="noopener">All Products</a></p>
       <% } else { %>
         <table class="basket-table">
