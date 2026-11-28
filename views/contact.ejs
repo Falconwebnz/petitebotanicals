@@ -71,6 +71,15 @@
                   I’m happy for these words and my name to appear on the homepage.
                 </label>
                 <% if (errors.permit) { %><p class="field-error" id="permit-error"><%= errors.permit %></p><% } %>
+                <label class="check" for="show-town">
+                  <input id="show-town" name="show_town" type="checkbox"<% if (note.showTown) { %> checked<% } %><% if (errors.town) { %> aria-invalid="true" aria-describedby="town-error"<% } %>>
+                  I’m happy for my town to appear too.
+                </label>
+                <div class="testimonial-town" data-town-field<% if (!note.showTown) { %> hidden<% } %>>
+                  <label for="town">Town</label>
+                  <input id="town" name="town" type="text" maxlength="80" value="<%= note.town %>" placeholder="For example, Rangiora"<% if (errors.town) { %> aria-invalid="true" aria-describedby="town-error"<% } %>>
+                  <% if (errors.town) { %><p class="field-error" id="town-error"><%= errors.town %></p><% } %>
+                </div>
               </div>
               <div class="span-2">
                 <label for="message">Your note</label>

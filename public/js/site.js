@@ -269,15 +269,25 @@
     var extra = document.querySelector('[data-testimonial-extra]');
     var message = document.querySelector('#message');
     if (!topic || !extra || !message) return;
-    var box = extra.querySelector('input[type="checkbox"]');
+    var box = document.querySelector('#permit');
+    var townBox = document.querySelector('#show-town');
+    var townField = document.querySelector('[data-town-field]');
+    var townInput = townField ? townField.querySelector('input') : null;
+    function applyTown() {
+      var show = topic.value === 'A testimonial' && townBox && townBox.checked;
+      if (townField) townField.hidden = !show;
+      if (townInput) townInput.required = !!show;
+    }
     function apply() {
       var on = topic.value === 'A testimonial';
       extra.hidden = !on;
       if (box) box.required = on;
       message.maxLength = on ? 600 : 1500;
       message.placeholder = on ? 'The words you’d like us to show.' : '';
+      applyTown();
     }
     topic.addEventListener('change', apply);
+    if (townBox) townBox.addEventListener('change', applyTown);
     apply();
   }
 
