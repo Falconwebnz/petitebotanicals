@@ -10,7 +10,7 @@ const db = require('./lib/db');
 const { PAGE_COPY, PAGE_GROUPS, segments, parsePolicy, aboutBlocks, parseGlossary, groupGlossary } = require('./lib/page-copy');
 const { MOCK_POOLS } = require('./lib/seed');
 const { REVIEWED, FAQ_TOPICS, CATEGORY_FAQS, PRODUCT_FAQS, GENERAL_FAQS, categoryHeading } = require('./lib/faq-copy');
-const { fingerprint, CATEGORY_COPY, PRODUCT_COPY, PRODUCT_RENAMES, FAQ_EDITS, FAQ_TEXT_FIXES } = require('./lib/copy-polish');
+const { fingerprint, withoutGlossaryPrompt, CATEGORY_COPY, PRODUCT_COPY, PRODUCT_RENAMES, FAQ_EDITS, FAQ_TEXT_FIXES } = require('./lib/copy-polish');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -689,6 +689,15 @@ function ensureCopyPolish() {
       changed = true;
     });
   });
+  const soothing = db.get('SELECT * FROM products WHERE slug = ?', ['soothing-balm-fragrance-free']);
+  if (soothing) {
+    ['ingredients', 'short_description', 'long_description', 'how_to_use', 'precautions', 'notes'].forEach((field) => {
+      const next = withoutGlossaryPrompt(soothing[field]);
+      if (next === String(soothing[field] || '')) return;
+      db.run('UPDATE products SET ' + field + ' = ? WHERE id = ?', [next, soothing.id]);
+      changed = true;
+    });
+  }
   PRODUCT_RENAMES.forEach((rename) => {
     const row = db.get('SELECT id, ' + rename.field + ' AS value FROM products WHERE slug = ?', [rename.slug]);
     if (!row || row.value !== rename.from) return;
