@@ -264,6 +264,23 @@
     });
   }
 
+  function startContactTopic() {
+    var topic = document.querySelector('#topic');
+    var extra = document.querySelector('[data-testimonial-extra]');
+    var message = document.querySelector('#message');
+    if (!topic || !extra || !message) return;
+    var box = extra.querySelector('input[type="checkbox"]');
+    function apply() {
+      var on = topic.value === 'A testimonial';
+      extra.hidden = !on;
+      if (box) box.required = on;
+      message.maxLength = on ? 600 : 1500;
+      message.placeholder = on ? 'The words you’d like us to show.' : '';
+    }
+    topic.addEventListener('change', apply);
+    apply();
+  }
+
   function start() {
     startHeroHeader();
     startSliders();
@@ -273,6 +290,7 @@
     startFaq();
     startCollectionVideos();
     startImageUploads();
+    startContactTopic();
   }
 
   if (document.readyState === 'loading') {

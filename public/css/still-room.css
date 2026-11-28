@@ -1595,9 +1595,6 @@ textarea { min-height: 110px; }
   display: flex;
   flex-direction: column;
 }
-.loved-stars { margin: 0 0 0.7rem; letter-spacing: 0.12em; font-size: 0.95rem; line-height: 1; }
-.loved-stars span { color: var(--gold); }
-.loved-stars-off { color: var(--paper-2); }
 .loved-card blockquote { margin: 0; }
 .loved-card blockquote p { margin: 0 0 0.7rem; font-size: 1.02rem; line-height: 1.6; color: var(--ink); }
 .loved-card blockquote::before {
@@ -1636,6 +1633,26 @@ textarea { min-height: 110px; }
   line-height: 1.6;
 }
 .loved-waiting-actions { justify-content: center; margin-top: 1.3rem; }
+.loved-desk {
+  max-width: 38rem;
+  margin: 2.4rem auto 0;
+  padding: 1.2rem 1.25rem 1.35rem;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  text-align: left;
+  scroll-margin-top: 7rem;
+}
+.loved-desk h3 { font-size: 1.85rem; line-height: 1.1; margin: 0.15rem 0 0.45rem; }
+.loved-desk-lead { margin: 0; color: var(--ink-soft); font-size: 0.98rem; line-height: 1.55; }
+.loved-desk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1.1rem;
+  margin-top: 1rem;
+}
+.loved-desk-actions a { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .loved-controls { display: flex; align-items: center; justify-content: center; gap: 0.9rem; margin-top: 1.1rem; }
 .loved-slider.is-static .loved-controls { display: none; }
 .loved-arrow {
@@ -1973,6 +1990,8 @@ textarea { min-height: 110px; }
   border-color: var(--rose);
 }
 .contact-form textarea { min-height: 150px; }
+.testimonial-permit[hidden] { display: none; }
+.testimonial-permit p { margin: 0.35rem 0 0.75rem; color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; }
 .contact-form .btn-still { margin-top: 1.1rem; }
 
 @media (min-width: 700px) {
