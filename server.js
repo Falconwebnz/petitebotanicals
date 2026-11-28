@@ -1804,12 +1804,10 @@ app.post('/admin/homepage', requireAdmin, (req, res) => {
 });
 
 function readTestimonial(body) {
-  const rating = Math.floor(Number(body.rating));
   return {
     quote: String(body.quote || '').replace(/\u0000/g, '').trim().slice(0, 600),
     name: String(body.name || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
     detail: String(body.detail || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
-    rating: Number.isFinite(rating) ? Math.min(5, Math.max(0, rating)) : 0,
     published: body.published ? 1 : 0,
   };
 }
@@ -1831,8 +1829,8 @@ app.post('/admin/testimonials', requireAdmin, (req, res) => {
   }
   const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
   db.run(
-    'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [fields.quote, fields.name, fields.detail, fields.rating, fields.published, Number(max.m) + 1, new Date().toISOString()]
+    'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, 0, ?, ?, ?)',
+    [fields.quote, fields.name, fields.detail, fields.published, Number(max.m) + 1, new Date().toISOString()]
   );
   db.save();
   req.session.flash = fields.published ? 'Testimonial added to the homepage.' : 'Testimonial saved as a draft.';
@@ -1846,8 +1844,8 @@ app.post('/admin/testimonials/:id', requireAdmin, (req, res) => {
     req.session.flash = 'A testimonial needs the customer’s words and a name.';
     return res.redirect('/admin/testimonials#t-' + id);
   }
-  db.run('UPDATE testimonials SET quote = ?, name = ?, detail = ?, rating = ?, published = ? WHERE id = ?', [
-    fields.quote, fields.name, fields.detail, fields.rating, fields.published, id,
+  db.run('UPDATE testimonials SET quote = ?, name = ?, detail = ?, published = ? WHERE id = ?', [
+    fields.quote, fields.name, fields.detail, fields.published, id,
   ]);
   db.save();
   req.session.flash = 'Testimonial updated.';

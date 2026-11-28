@@ -70,9 +70,6 @@
         <div class="loved-track" data-slider-track tabindex="0">
           <% testimonials.forEach(function (t, i) { %>
             <figure class="loved-card" role="group" aria-roledescription="slide" aria-label="<%= i + 1 %> of <%= testimonials.length %>">
-              <% if (Number(t.rating)) { %>
-                <p class="loved-stars" role="img" aria-label="Rated <%= t.rating %> out of 5"><span aria-hidden="true"><%= '★'.repeat(t.rating) %></span><span class="loved-stars-off" aria-hidden="true"><%= '★'.repeat(5 - t.rating) %></span></p>
-              <% } %>
               <blockquote>
                 <% String(t.quote).split(/\n\s*\n/).forEach(function (para) { %><% if (para.trim()) { %><p><%= para.trim() %></p><% } %><% }) %>
               </blockquote>
@@ -113,15 +110,6 @@
         <input id="loved-name" name="name" type="text" maxlength="80" required placeholder="For example, Sarah M.">
         <label for="loved-detail">Town or product (optional)</label>
         <input id="loved-detail" name="detail" type="text" maxlength="80" placeholder="For example, Rangiora">
-        <label for="loved-rating">Stars</label>
-        <select id="loved-rating" name="rating">
-          <option value="5">5 of 5</option>
-          <option value="4">4 of 5</option>
-          <option value="3">3 of 5</option>
-          <option value="2">2 of 5</option>
-          <option value="1">1 of 5</option>
-          <option value="0">No stars</option>
-        </select>
         <label class="check"><input type="checkbox" name="published" checked> Show on the homepage</label>
         <div class="loved-desk-actions">
           <button class="btn-still" type="submit">Add to Loved by Customers</button>

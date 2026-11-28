@@ -1595,9 +1595,6 @@ textarea { min-height: 110px; }
   display: flex;
   flex-direction: column;
 }
-.loved-stars { margin: 0 0 0.7rem; letter-spacing: 0.12em; font-size: 0.95rem; line-height: 1; }
-.loved-stars span { color: var(--gold); }
-.loved-stars-off { color: var(--paper-2); }
 .loved-card blockquote { margin: 0; }
 .loved-card blockquote p { margin: 0 0 0.7rem; font-size: 1.02rem; line-height: 1.6; color: var(--ink); }
 .loved-card blockquote::before {
