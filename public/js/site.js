@@ -157,8 +157,117 @@
     });
   }
 
+  function calmMotion() {
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function startSliders() {
+    var sliders = document.querySelectorAll('[data-slider]');
+    Array.prototype.forEach.call(sliders, function (slider) {
+      var track = slider.querySelector('[data-slider-track]');
+      var slides = track ? track.children : [];
+      var dotsBox = slider.querySelector('[data-slider-dots]');
+      var prev = slider.querySelector('[data-slider-prev]');
+      var next = slider.querySelector('[data-slider-next]');
+      if (!track || slides.length < 2) return;
+      var dots = [];
+      var timer = null;
+
+      function step() {
+        return slides[1].offsetLeft - slides[0].offsetLeft;
+      }
+      function pages() {
+        return slides.length;
+      }
+      function current() {
+        var size = step();
+        return size ? Math.min(slides.length - 1, Math.round(track.scrollLeft / size)) : 0;
+      }
+      function go(index) {
+        var count = pages();
+        var target = ((index % count) + count) % count;
+        track.scrollTo({ left: slides[target].offsetLeft - slides[0].offsetLeft, behavior: calmMotion() ? 'auto' : 'smooth' });
+      }
+      function drawDots() {
+        if (!dotsBox) return;
+        dotsBox.innerHTML = '';
+        dots = [];
+        for (var i = 0; i < pages(); i++) {
+          var dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'loved-dot';
+          dot.setAttribute('aria-label', 'Show testimonial ' + (i + 1));
+          dot.addEventListener('click', (function (n) { return function () { go(n); restart(); }; })(i));
+          dotsBox.appendChild(dot);
+          dots.push(dot);
+        }
+        mark();
+      }
+      function mark() {
+        var at = current();
+        dots.forEach(function (dot, i) {
+          dot.classList.toggle('is-active', i === at);
+          dot.setAttribute('aria-current', i === at ? 'true' : 'false');
+        });
+        var single = pages() < 2;
+        slider.classList.toggle('is-static', single);
+      }
+      function stop() {
+        if (timer) clearInterval(timer);
+        timer = null;
+      }
+      function restart() {
+        stop();
+        if (calmMotion() || pages() < 2) return;
+        timer = setInterval(function () { go(current() + 1); }, 7000);
+      }
+
+      if (prev) prev.addEventListener('click', function () { go(current() - 1); restart(); });
+      if (next) next.addEventListener('click', function () { go(current() + 1); restart(); });
+      track.addEventListener('keydown', function (event) {
+        if (event.key === 'ArrowRight') { event.preventDefault(); go(current() + 1); restart(); }
+        if (event.key === 'ArrowLeft') { event.preventDefault(); go(current() - 1); restart(); }
+      });
+      var markTimer = null;
+      track.addEventListener('scroll', function () {
+        if (markTimer) clearTimeout(markTimer);
+        markTimer = setTimeout(mark, 80);
+      }, { passive: true });
+      slider.addEventListener('mouseenter', stop);
+      slider.addEventListener('mouseleave', restart);
+      slider.addEventListener('focusin', stop);
+      slider.addEventListener('focusout', function (event) {
+        if (!slider.contains(event.relatedTarget)) restart();
+      });
+      var resizeTimer = null;
+      window.addEventListener('resize', function () {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () { drawDots(); restart(); }, 150);
+      });
+      drawDots();
+      restart();
+    });
+  }
+
+  function startToTop() {
+    var button = document.querySelector('[data-to-top]');
+    if (!button) return;
+    function apply() {
+      button.classList.toggle('is-visible', window.scrollY > Math.min(600, window.innerHeight * 0.8));
+    }
+    apply();
+    window.addEventListener('scroll', apply, { passive: true });
+    button.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: calmMotion() ? 'auto' : 'smooth' });
+      var skip = document.querySelector('.site-header a, header a');
+      if (skip) skip.focus({ preventScroll: true });
+    });
+  }
+
   function start() {
     startHeroHeader();
+    startSliders();
+    startToTop();
     startShopMenu();
     startRail();
     startFaq();

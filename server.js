@@ -10,6 +10,7 @@ const db = require('./lib/db');
 const { PAGE_COPY, PAGE_GROUPS, segments, parsePolicy, aboutBlocks, parseGlossary, groupGlossary } = require('./lib/page-copy');
 const { MOCK_POOLS } = require('./lib/seed');
 const { REVIEWED, FAQ_TOPICS, CATEGORY_FAQS, PRODUCT_FAQS, GENERAL_FAQS, categoryHeading } = require('./lib/faq-copy');
+const { fingerprint, CATEGORY_COPY, PRODUCT_COPY, PRODUCT_RENAMES, FAQ_EDITS, FAQ_TEXT_FIXES } = require('./lib/copy-polish');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -575,47 +576,90 @@ function hiddenCategoryIds(settings) {
   return new Set(categories().filter((cat) => isComingSoon(cat, s)).map((cat) => Number(cat.id)));
 }
 
+function shopName(name) {
+  return String(name || '').replace(/\s*\(starter\)\s*/gi, ' ').trim();
+}
+
 function onSale(rows, settings) {
   const hidden = hiddenCategoryIds(settings);
   return rows.filter((row) => !hidden.has(Number(row.category_id)));
 }
 
-const BALMS_ABOUT_OPENING = 'Small-batch botanical balms for lips, hands, body and everyday skin care.';
+function looseText(text) {
+  return String(text || '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
+}
 
-const BALMS_ABOUT = `Small-batch balms for lips, hands and body, made in Canterbury with no synthetic fragrance.
+function faqScopeRows(scope, question) {
+  if (scope.general) {
+    return db.all('SELECT * FROM faqs WHERE category_id = 0 AND product_id IS NULL AND question = ?', [question]);
+  }
+  if (scope.category) {
+    const cat = db.get('SELECT id FROM categories WHERE slug = ?', [scope.category]);
+    return cat ? db.all('SELECT * FROM faqs WHERE category_id = ? AND product_id IS NULL AND question = ?', [cat.id, question]) : [];
+  }
+  // Matched on the answer text, because a product question can be copied to several products.
+  return db.all('SELECT * FROM faqs WHERE product_id IS NOT NULL AND question = ?', [question]);
+}
 
-# Lip balms
-Pure Lip Balm keeps it simple: no colour, no flavour and no scent.
-
-Rosy Beet and Ruby Beet lip balms are unflavoured and unscented too, with a tint from organic beetroot powder. Rosy Beet gives a light, sheer colour. Ruby Beet is deeper, if you like a bit more.
-
-# Balms for body and hands
-Foot Balm is a rich, water-free hemp seed balm with rose geranium, peppermint and a little ylang ylang. Use it on dry feet, hands, elbows and knees.
-
-Gardener’s Balm and our unscented Soothing Balm are all-rounders for everyday skin care. Rub a little in wherever skin feels dry or tight.
-
-# Magnesium rubs
-Rosemary & Frankincense Magnesium Rub is a smooth massage cream for legs, feet, shoulders and hands, with peppermint and copaiba.
-
-Fragrance-Free Magnesium Rub is a smooth, unscented massage cream for anyone who would rather skip the scent.
-
-# How they’re made
-Every balm and rub is made in small batches in Canterbury. We use well-documented ingredients, organic where we can, and no synthetic fragrance.
-
-They come in glass jars. When yours is empty, please reuse or recycle it.
-
-# Care and use
-For external use only. Keep away from the eyes, and stop using it if your skin becomes irritated. Keep out of reach of children and pets.
-
-These are cosmetic body-care products, not medical treatments.`;
-
-function ensureBalmsAbout() {
-  const row = db.get('SELECT id, intro FROM categories WHERE slug = ?', ['balms']);
-  if (!row) return;
-  const intro = String(row.intro || '').trim();
-  if (!intro.startsWith(BALMS_ABOUT_OPENING) || /^#\s/m.test(intro)) return;
-  db.run('UPDATE categories SET intro = ? WHERE id = ?', [BALMS_ABOUT, row.id]);
-  db.save();
+function ensureCopyPolish() {
+  let changed = false;
+  const mists = db.get('SELECT id, name, about_title FROM categories WHERE slug = ?', ['mist-sprays']);
+  if (mists && mists.name === 'Magnesium Body Mist') {
+    db.run('UPDATE categories SET name = ? WHERE id = ?', ['Magnesium Body Mists', mists.id]);
+    changed = true;
+  }
+  if (mists && mists.about_title === 'About our Magnesium Body Mist') {
+    db.run('UPDATE categories SET about_title = ? WHERE id = ?', ['About our Magnesium Body Mists', mists.id]);
+    changed = true;
+  }
+  Object.keys(CATEGORY_COPY).forEach((slug) => {
+    const row = db.get('SELECT id, intro FROM categories WHERE slug = ?', [slug]);
+    if (!row || String(row.intro || '').trim() === CATEGORY_COPY[slug].intro.trim()) return;
+    if (!CATEGORY_COPY[slug].was.includes(fingerprint(row.intro))) return;
+    db.run('UPDATE categories SET intro = ? WHERE id = ?', [CATEGORY_COPY[slug].intro, row.id]);
+    changed = true;
+  });
+  Object.keys(PRODUCT_COPY).forEach((slug) => {
+    const row = db.get('SELECT * FROM products WHERE slug = ?', [slug]);
+    if (!row) return;
+    Object.keys(PRODUCT_COPY[slug]).forEach((field) => {
+      const spec = PRODUCT_COPY[slug][field];
+      if (String(row[field] || '').trim() === spec.text.trim()) return;
+      if (fingerprint(row[field]) !== spec.was) return;
+      db.run('UPDATE products SET ' + field + ' = ? WHERE id = ?', [spec.text, row.id]);
+      changed = true;
+    });
+  });
+  PRODUCT_RENAMES.forEach((rename) => {
+    const row = db.get('SELECT id, ' + rename.field + ' AS value FROM products WHERE slug = ?', [rename.slug]);
+    if (!row || row.value !== rename.from) return;
+    db.run('UPDATE products SET ' + rename.field + ' = ? WHERE id = ?', [rename.to, row.id]);
+    changed = true;
+  });
+  FAQ_EDITS.forEach((edit) => {
+    faqScopeRows(edit.scope, edit.question).forEach((faq) => {
+      if (!looseText(faq.answer).includes(looseText(edit.has))) return;
+      if (edit.remove) {
+        db.run('DELETE FROM faqs WHERE id = ?', [faq.id]);
+      } else {
+        const answer = edit.answer || (edit.find ? String(faq.answer).split(edit.find).join(edit.replace) : faq.answer);
+        db.run('UPDATE faqs SET question = ?, answer = ? WHERE id = ?', [edit.nextQuestion || faq.question, answer, faq.id]);
+      }
+      changed = true;
+    });
+  });
+  db.all('SELECT id, question, answer FROM faqs').forEach((faq) => {
+    let question = String(faq.question || '');
+    let answer = String(faq.answer || '');
+    FAQ_TEXT_FIXES.forEach(([from, to]) => {
+      question = question.split(from).join(to);
+      answer = answer.split(from).join(to);
+    });
+    if (question === faq.question && answer === faq.answer) return;
+    db.run('UPDATE faqs SET question = ?, answer = ? WHERE id = ?', [question, answer, faq.id]);
+    changed = true;
+  });
+  if (changed) db.save();
 }
 
 app.use((req, res, next) => {
@@ -636,6 +680,8 @@ app.use((req, res, next) => {
   res.locals.year = new Date().getFullYear();
   res.locals.segments = segments;
   res.locals.contentBlocks = (raw) => parsePolicy(raw || '').blocks;
+  res.locals.textBlocks = aboutBlocks;
+  res.locals.shopName = shopName;
   res.locals.origin = req.protocol + '://' + req.get('host');
   res.locals.description = 'Petite Botanicals. Small-batch botanical perfume oils, balms and mists made in Canterbury, New Zealand.';
   res.locals.canonical = res.locals.origin + (req.path === '/search' ? '/search' : req.path);
@@ -709,7 +755,8 @@ app.get('/', (req, res) => {
     const bi = HOME_COLLECTION_ORDER.indexOf(b.slug);
     return (ai < 0 ? HOME_COLLECTION_ORDER.length : ai) - (bi < 0 ? HOME_COLLECTION_ORDER.length : bi);
   });
-  res.render('home', { title: 'Home', settings, featured, cats });
+  const testimonials = db.all('SELECT * FROM testimonials WHERE published = 1 ORDER BY sort_order, id');
+  res.render('home', { title: 'Home', settings, featured, cats, testimonials });
 });
 
 app.get('/shop', (req, res) => {
@@ -741,7 +788,7 @@ function productMatch(product, q) {
     ['the ingredients', product.ingredients],
     ['the notes', product.notes],
     ['how to use', product.how_to_use],
-    ['the care notes', product.precautions],
+    ['the precautions', product.precautions],
     ['the description', product.long_description],
     ['the size', product.size],
     ['the collection', product.category_name],
@@ -862,7 +909,7 @@ app.get('/product/:slug', (req, res) => {
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 180);
-  res.render('product', { title: product.name, product, related, faqs: faqsForProduct(product), description });
+  res.render('product', { title: shopName(product.name), product, related, faqs: faqsForProduct(product), description });
 });
 
 app.get('/faq', (req, res) => {
@@ -1099,14 +1146,14 @@ app.post('/cart/add', (req, res) => {
   const qty = Math.min(available, requested);
   const cart = req.session.cart || [];
   const existing = cart.find((line) => Number(line.id) === Number(product.id));
-  const limited = 'Only ' + available + ' of ' + product.name + ' is in stock. The basket has that amount.';
+  const limited = 'Only ' + available + ' of ' + shopName(product.name) + ' is in stock. The basket has that amount.';
   if (existing) {
     const next = existing.qty + qty;
     existing.qty = Math.min(99, available, next);
-    req.session.flash = next > available ? limited : product.name + ' is in the basket.';
+    req.session.flash = next > available ? limited : shopName(product.name) + ' is in the basket.';
   } else {
     cart.push({ id: product.id, qty });
-    req.session.flash = requested > available ? limited : product.name + ' is in the basket.';
+    req.session.flash = requested > available ? limited : shopName(product.name) + ' is in the basket.';
   }
   req.session.cart = cart;
   res.redirect('/cart');
@@ -1755,6 +1802,78 @@ app.post('/admin/homepage', requireAdmin, (req, res) => {
   });
 });
 
+function readTestimonial(body) {
+  const rating = Math.floor(Number(body.rating));
+  return {
+    quote: String(body.quote || '').replace(/\u0000/g, '').trim().slice(0, 600),
+    name: String(body.name || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
+    detail: String(body.detail || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
+    rating: Number.isFinite(rating) ? Math.min(5, Math.max(0, rating)) : 0,
+    published: body.published ? 1 : 0,
+  };
+}
+
+function allTestimonials() {
+  return db.all('SELECT * FROM testimonials ORDER BY sort_order, id');
+}
+
+app.get('/admin/testimonials', requireAdmin, (req, res) => {
+  res.render('admin/testimonials', { title: 'Testimonials', testimonials: allTestimonials() });
+});
+
+app.post('/admin/testimonials', requireAdmin, (req, res) => {
+  const fields = readTestimonial(req.body);
+  if (!fields.quote || !fields.name) {
+    req.session.flash = 'A testimonial needs the customer’s words and a name.';
+    return res.redirect('/admin/testimonials#new');
+  }
+  const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
+  db.run(
+    'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [fields.quote, fields.name, fields.detail, fields.rating, fields.published, Number(max.m) + 1, new Date().toISOString()]
+  );
+  db.save();
+  req.session.flash = fields.published ? 'Testimonial added to the homepage.' : 'Testimonial saved as a draft.';
+  res.redirect('/admin/testimonials');
+});
+
+app.post('/admin/testimonials/:id', requireAdmin, (req, res) => {
+  const id = Number(req.params.id);
+  const fields = readTestimonial(req.body);
+  if (!fields.quote || !fields.name) {
+    req.session.flash = 'A testimonial needs the customer’s words and a name.';
+    return res.redirect('/admin/testimonials#t-' + id);
+  }
+  db.run('UPDATE testimonials SET quote = ?, name = ?, detail = ?, rating = ?, published = ? WHERE id = ?', [
+    fields.quote, fields.name, fields.detail, fields.rating, fields.published, id,
+  ]);
+  db.save();
+  req.session.flash = 'Testimonial updated.';
+  res.redirect('/admin/testimonials#t-' + id);
+});
+
+app.post('/admin/testimonials/:id/delete', requireAdmin, (req, res) => {
+  db.run('DELETE FROM testimonials WHERE id = ?', [Number(req.params.id)]);
+  db.save();
+  req.session.flash = 'Testimonial removed.';
+  res.redirect('/admin/testimonials');
+});
+
+app.post('/admin/testimonials/:id/move', requireAdmin, (req, res) => {
+  const id = Number(req.params.id);
+  const rows = allTestimonials();
+  const index = rows.findIndex((row) => Number(row.id) === id);
+  const next = req.body.direction === 'up' ? index - 1 : index + 1;
+  if (index >= 0 && next >= 0 && next < rows.length) {
+    const hold = rows[index];
+    rows[index] = rows[next];
+    rows[next] = hold;
+    rows.forEach((row, i) => db.run('UPDATE testimonials SET sort_order = ? WHERE id = ?', [i, row.id]));
+    db.save();
+  }
+  res.redirect('/admin/testimonials#t-' + id);
+});
+
 app.get('/admin/pages', requireAdmin, (req, res) => {
   res.render('admin/pages', { title: 'Pages', settings: ensurePageCopy() });
 });
@@ -1827,6 +1946,8 @@ app.use((err, req, res, next) => {
   res.locals.menuImageFor = res.locals.menuImageFor || function () { return '/images/brand/logo.png'; };
   res.locals.liveImage = res.locals.liveImage || liveImage;
   res.locals.isComingSoon = res.locals.isComingSoon || function () { return false; };
+  res.locals.shopName = res.locals.shopName || shopName;
+  res.locals.textBlocks = res.locals.textBlocks || aboutBlocks;
   res.status(500).render('missing', { title: 'Something went wrong', status: 500 }, function (renderErr, html) {
     if (renderErr) return res.status(500).type('text').send('Something went wrong.');
     res.send(html);
@@ -1840,7 +1961,7 @@ db.init()
     ensureFaqs();
     ensureLocalCollection();
     ensureComingSoon();
-    ensureBalmsAbout();
+    ensureCopyPolish();
     app.listen(PORT, '0.0.0.0', () => {
       const pruneTimer = setInterval(function pruneSessions() {
         const now = Date.now();

@@ -47,19 +47,7 @@
   <section class="category-about" aria-labelledby="about-heading">
     <div class="still-wrap">
       <% if (category.about_title) { %><h2 id="about-heading"><%= category.about_title %></h2><% } %>
-      <% aboutBlocks.forEach(function (block) { %>
-        <% if (block.type === 'h3') { %>
-          <h3><%= block.text %></h3>
-        <% } else if (block.type === 'ul') { %>
-          <ul>
-            <% block.items.forEach(function (item) { %>
-              <li><%- include('partials/rich', { parts: item }) %></li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <p><%- include('partials/rich', { parts: block.parts }) %></p>
-        <% } %>
-      <% }) %>
+      <%- include('partials/text-blocks', { blocks: aboutBlocks }) %>
     </div>
   </section>
   <% } %>
