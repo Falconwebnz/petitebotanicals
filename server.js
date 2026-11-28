@@ -941,7 +941,7 @@ app.get('/pickup', (req, res) => {
   res.render('pickup', { title: 'Click & Collect', settings: ensurePageCopy() });
 });
 
-const CONTACT_TOPICS = ['An order', 'A product or scent', 'Local collection', 'A testimonial', 'Something else'];
+const CONTACT_TOPICS = ['A question about an order', 'A product or scent', 'Local collection', 'A testimonial', 'Something else'];
 const TESTIMONIAL_TOPIC = 'A testimonial';
 const contactHits = new Map();
 
