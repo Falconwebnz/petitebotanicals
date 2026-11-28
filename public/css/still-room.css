@@ -275,9 +275,9 @@ a:hover { color: var(--terracotta); }
 }
 
 @media (min-width: 992px) and (max-width: 1199.98px) {
-  .desktop-nav { gap: 0.42rem; }
-  .desktop-nav a { letter-spacing: 0.03em; font-size: 0.7rem; }
-  .search-form { max-width: 10rem; min-width: 0; flex-basis: 7rem; }
+  .desktop-nav { gap: 0.28rem; }
+  .desktop-nav a { letter-spacing: 0.02em; font-size: 0.68rem; }
+  .search-form { max-width: 9rem; min-width: 0; flex-basis: 6.5rem; }
 }
 
 .desktop-nav a:hover,
