@@ -5,17 +5,22 @@
   <section class="section" style="padding-top:1.4rem;">
     <div class="still-wrap">
       <h1 class="serif" style="font-size:3rem;">Categories</h1>
-      <p class="muted">The four categories stay fixed. You can rewrite the about title and text, and change the hero image. The about text sits below the products. FAQs are edited under <a href="/admin/faqs">FAQs</a>.</p>
+      <p class="muted">The four categories stay fixed. You can rewrite the about title and text, and change the hero image. The about text sits below the products. Start a line with <code># </code> to make it a subheading, and leave a blank line between paragraphs. FAQs are edited under <a href="/admin/faqs">FAQs</a>.</p>
       <% cats.forEach(function (cat) { %>
         <article class="form-card">
           <h2 class="serif" style="margin-top:0;"><%= cat.name %></h2>
           <form method="post" action="/admin/categories/<%= cat.id %>" enctype="multipart/form-data">
+            <label class="check" for="soon-<%= cat.id %>">
+              <input id="soon-<%= cat.id %>" name="coming_soon" type="checkbox" value="1" <%= isComingSoon(cat) ? 'checked' : '' %>>
+              Show as Coming Soon on the shop
+            </label>
+            <p class="muted">While this is ticked, the shop hides this category’s products, about text and FAQs. Everything stays saved here, so untick it to bring them back.</p>
             <label for="about-title-<%= cat.id %>">About title</label>
             <input id="about-title-<%= cat.id %>" name="about_title" type="text" value="<%= cat.about_title || '' %>">
             <label for="intro-<%= cat.id %>">About</label>
             <textarea id="intro-<%= cat.id %>" name="intro"><%= cat.intro || '' %></textarea>
             <label for="hero-<%= cat.id %>">Hero image</label>
-            <% if (cat.hero_image) { %><p class="muted">Current: <%= cat.hero_image %></p><% } %>
+            <% if (cat.hero_image && !liveImage(cat.hero_image)) { %><p class="starter-note">The saved hero image is missing from the server. Upload it again.</p><% } else if (cat.hero_image) { %><p class="muted">Current: <%= cat.hero_image %></p><% } %>
             <input id="hero-<%= cat.id %>" name="hero_image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
             <p style="margin-top:1rem;"><button class="btn-still" type="submit">Save <%= cat.name %></button></p>
           </form>

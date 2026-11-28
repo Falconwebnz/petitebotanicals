@@ -1,7 +1,8 @@
+<% var cardImage = liveImage(product.image); %>
 <article class="batch-card">
   <a class="batch-visual" href="/product/<%= product.slug %>" target="_blank" rel="noopener">
-    <% if (product.image) { %>
-      <img src="<%= product.image %>" alt="<%= product.name %>" oncontextmenu="return false;">
+    <% if (cardImage) { %>
+      <img src="<%= cardImage %>" alt="<%= product.name %>" oncontextmenu="return false;">
     <% } else { %>
       <div class="plate">
         <span><%= product.category_name %></span>

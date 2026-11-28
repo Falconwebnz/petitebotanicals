@@ -2,7 +2,7 @@
 <%- include('partials/header') %>
 <main>
   <section class="hero" aria-label="Petite Botanicals">
-    <img class="hero-photo hero-photo--meadow" src="<%= settings.hero_image || '/images/brand/meadow.jpg' %>" alt="Red-haired woman in a white-flower meadow" fetchpriority="high" oncontextmenu="return false;">
+    <img class="hero-photo hero-photo--meadow" src="<%= liveImage(settings.hero_image) || '/images/brand/meadow.jpg' %>" alt="Red-haired woman in a white-flower meadow" fetchpriority="high" oncontextmenu="return false;">
     <div class="hero-scrim"></div>
     <div class="still-wrap hero-inner">
       <p class="eyebrow"><%= settings.hero_kicker %></p>
@@ -64,20 +64,16 @@
     <div class="quiet-scrim" aria-hidden="true"></div>
     <div class="section quiet-copy">
       <div class="still-wrap">
-        <div class="house-grid">
-          <article>
-            <p class="eyebrow">Ingredients</p>
-            <h2>Sourcing the highest quality</h2>
-            <p>Botanical perfumes and body care, made without synthetic fragrance. Essential oils and simple bases, so you can read what is in each product.</p>
-            <div class="text-tabs"><a class="text-tab" href="/glossary" target="_blank" rel="noopener">Read the glossary</a></div>
-          </article>
-          <article>
-            <p class="eyebrow">Sourcing</p>
-            <h2>Made in Canterbury.</h2>
-            <p>Small batches, made in Canterbury, New Zealand. Perfume oils use organic essential oils in organic jojoba, with documented botanicals throughout the range.</p>
-            <div class="text-tabs"><a class="text-tab" href="/standards" target="_blank" rel="noopener">Our Standards</a></div>
-          </article>
-        </div>
+        <article class="house-note">
+          <p class="eyebrow">Ingredients &amp; sourcing</p>
+          <h2>Simple ingredients, made in Canterbury.</h2>
+          <p>Everything is made in small batches in Canterbury, New Zealand, with no synthetic fragrance.</p>
+          <p>We use essential oils, organic where we can, in simple bases, so you can read exactly what’s in each product.</p>
+          <div class="text-tabs">
+            <a class="text-tab" href="/glossary" target="_blank" rel="noopener">Read the glossary</a>
+            <a class="text-tab" href="/standards" target="_blank" rel="noopener">Our Standards</a>
+          </div>
+        </article>
       </div>
     </div>
     <p class="place-ref">Gore Bay, North Canterbury</p>

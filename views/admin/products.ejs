@@ -16,7 +16,7 @@
           <tbody>
             <% products.forEach(function (product) { %>
               <tr>
-                <td><% if (product.image) { %><img class="thumb" src="<%= product.image %>" alt=""><% } %></td>
+                <td><% if (product.image && !liveImage(product.image)) { %><span class="stock-flag out">Image missing</span><% } else if (product.image) { %><img class="thumb" src="<%= product.image %>" alt=""><% } %></td>
                 <td><a href="/product/<%= product.slug %>" target="_blank" rel="noopener"><%= product.name %></a><div class="muted"><%= product.size %></div></td>
                 <td><%= product.category_name %></td>
                 <td><%= nzd(product.price_cents) %></td>
