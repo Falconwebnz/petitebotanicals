@@ -5,7 +5,7 @@
   <section class="section" style="padding-top:1.4rem;">
     <div class="still-wrap" style="max-width:820px;">
       <h1 class="serif" style="font-size:3rem;">Loved by Customers</h1>
-      <p class="muted">Add a customer’s own words here, with their permission. Notes marked “Show on the homepage” appear in the Loved by Customers band, under the featured products. Until one is showing, visitors see a short line and a link to write in. You can also add a note from the homepage while you are signed in. A testimonial sent from the contact page arrives here unticked, so you can read it before it goes on the homepage.</p>
+      <p class="muted">Add a customer’s own words here, with their permission. Notes marked “Show on the homepage” appear in the Loved by Customers band, under the featured products. Until one is showing, visitors see a short line and a link to write in. A testimonial sent from the contact page arrives here unticked, so you can read it before it goes on the homepage.</p>
       <% var published = testimonials.filter(function (t) { return Number(t.published); }).length; %>
       <p class="muted"><strong><%= published %></strong> of <%= testimonials.length %> on the homepage.</p>
       <% testimonials.forEach(function (t, index) { %>
