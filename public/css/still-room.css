@@ -261,23 +261,23 @@ a:hover { color: var(--terracotta); }
 
 .desktop-nav {
   display: none;
-  gap: 1.35rem;
+  gap: 1.05rem;
   align-items: center;
 }
 
 .desktop-nav a {
   color: var(--ink);
   text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.14em;
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 @media (min-width: 992px) and (max-width: 1199.98px) {
-  .desktop-nav { gap: 0.7rem; }
-  .desktop-nav a { letter-spacing: 0.06em; }
-  .search-form { max-width: 12rem; }
+  .desktop-nav { gap: 0.42rem; }
+  .desktop-nav a { letter-spacing: 0.03em; font-size: 0.7rem; }
+  .search-form { max-width: 10rem; min-width: 0; flex-basis: 7rem; }
 }
 
 .desktop-nav a:hover,
@@ -1565,7 +1565,7 @@ textarea { min-height: 110px; }
 .category-about ul { padding-left: 1.3rem; }
 .category-about li { margin: 0.25rem 0; }
 
-.loved { background: var(--paper-2); }
+.loved { background: var(--paper-2); scroll-margin-top: 100px; }
 .loved-wrap { max-width: 1240px; }
 .loved .section-head { text-align: center; margin-left: auto; margin-right: auto; }
 .loved-slider { max-width: 68rem; margin: 0 auto; }

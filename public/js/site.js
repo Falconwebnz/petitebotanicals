@@ -76,6 +76,18 @@
     });
   }
 
+  function startSectionLink() {
+    var id = '';
+    try { id = decodeURIComponent((location.hash || '').replace(/^#/, '')); } catch (error) { return; }
+    if (!id) return;
+    var target = document.getElementById(id);
+    if (!target) return;
+    function align() { target.scrollIntoView(); }
+    align();
+    window.addEventListener('load', align);
+    window.setTimeout(align, 400);
+  }
+
   function startRail() {
     if (!window.jQuery || !jQuery.fn.slick) return;
     var $rail = jQuery('.batch-rail');
@@ -297,6 +309,7 @@
     startToTop();
     startShopMenu();
     startRail();
+    startSectionLink();
     startFaq();
     startCollectionVideos();
     startImageUploads();
