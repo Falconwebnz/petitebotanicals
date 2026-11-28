@@ -363,6 +363,16 @@ function ensureLocalCollection() {
       'Collect from the studio lockbox in Rangiora. At checkout, leave a name for the lockbox. We email or text the combination code when the order is ready.',
       'There is no national delivery just yet, so collecting your order saves the shipping charge.\n\nAt checkout, give us the mobile number you want us to text. The padlock code is the last four digits of that number.\n\nWhen your order is in the lockbox, we text you to say it is ready, and where to collect it.',
     ],
+    ['Local Pickup — Rangiora', ''],
+    [
+      'Collect your order from our secure Local Pickup Box in Rangiora.',
+      'There is no national delivery just yet, so collecting your order saves the shipping charge.',
+    ],
+    [
+      'At checkout, leave a name for the lockbox. Once your order is ready, we email or text you the combination code.',
+      'At checkout, give us the mobile number you want us to text. The padlock code is the last four digits of that number.\n\nWhen your order is in the lockbox, we text you to say it is ready, and where to collect it.',
+    ],
+    ['Leave the name for the collection at checkout, or add a time that suits you.', ''],
   ]) || changed;
   changed = patchSetting('pickup_lead', [
     ['A lock box is available for local pickups.', 'A lockbox on the property, with a padlock.'],
@@ -370,6 +380,7 @@ function ensureLocalCollection() {
   changed = patchSetting('pickup_aside', [
     ['Local collection, or delivery nationwide.', 'Studio collection in Rangiora.'],
     ['Studio collection in Rangiora.', 'Collection in Rangiora.'],
+    ['Local collection option.', 'Collection in Rangiora.'],
   ]) || changed;
   changed = patchSetting('lockbox_note', [
     ['A lock box is available for local pickups.', 'The padlock code is the last four digits of your mobile number. We text you when the order is in the lockbox.'],
