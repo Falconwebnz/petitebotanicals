@@ -214,7 +214,12 @@ a:hover { color: var(--terracotta); }
   color: var(--green-deep);
 }
 
-.brand:hover { color: var(--green-deep); }
+.brand:hover,
+.brand:focus,
+.brand:focus-visible {
+  color: var(--green-deep);
+  text-decoration: none;
+}
 
 .brand .logo-clip {
   width: 84px;
@@ -365,16 +370,18 @@ a:hover { color: var(--terracotta); }
 }
 
 .nav-mega {
-  left: 50%;
-  right: auto;
-  width: min(940px, calc(100vw - 2rem));
+  left: 0;
+  right: 0;
+  width: auto;
   max-height: none;
   overflow: visible;
-  transform: translateX(-50%);
+  transform: none;
   display: grid;
-  grid-template-columns: minmax(12rem, 16rem) 1fr;
-  gap: 1.25rem 1.5rem;
-  padding: 1.15rem 1.2rem 1.25rem;
+  grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr);
+  gap: 1.35rem 2.25rem;
+  align-items: center;
+  padding: 1.6rem max(4.75rem, calc((100% - 1120px) / 2)) 1.75rem;
+  border-radius: 10%;
 }
 
 .mega-links a {
@@ -410,6 +417,7 @@ a:hover { color: var(--terracotta); }
   aspect-ratio: 3 / 4;
   object-fit: cover;
   background: var(--paper-2);
+  border-radius: 10%;
 }
 
 .mega-card span {
@@ -551,6 +559,7 @@ a:hover { color: var(--terracotta); }
   padding: 12vh 0 1.2rem;
   max-width: min(1120px, calc(100% - 2rem));
   width: 100%;
+  text-align: center;
 }
 
 .hero-actions {
@@ -569,7 +578,8 @@ a:hover { color: var(--terracotta); }
   font-weight: 500;
   font-size: clamp(3.1rem, 7vw, 5.6rem);
   line-height: 0.92;
-  margin: 0 0 1rem;
+  margin: 0 auto 1rem;
+  text-align: center;
 }
 
 .hero .eyebrow { color: #f7f3ea; }
@@ -585,7 +595,7 @@ a:hover { color: var(--terracotta); }
   width: 72px;
   height: 1px;
   background: var(--gold-line);
-  margin: 1.1rem 0 1.2rem;
+  margin: 1.1rem auto 1.2rem;
   border: 0;
 }
 
@@ -828,7 +838,7 @@ code, kbd {
   justify-content: center;
   padding: 1.15rem;
   overflow: hidden;
-  border-radius: var(--radius-md);
+  border-radius: 10%;
 }
 
 .batch-visual img {
@@ -1173,7 +1183,7 @@ code, kbd {
   align-items: center;
   justify-content: center;
   padding: 1.6rem;
-  border-radius: var(--radius-md);
+  border-radius: 10%;
 }
 .figure-frame img { width: 100%; height: 100%; object-fit: contain; }
 .card-block {
