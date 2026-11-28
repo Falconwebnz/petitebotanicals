@@ -75,7 +75,7 @@
               </blockquote>
               <figcaption>
                 <span class="loved-mark" aria-hidden="true"><%= String(t.name || '').trim().charAt(0) %></span>
-                <span class="loved-who"><strong><%= t.name %></strong><% if (t.detail) { %><span><%= t.detail %></span><% } %></span>
+                <span class="loved-who"><strong><%= t.name %></strong><% if (t.product) { %><span><%= t.product %></span><% } %><% if (t.detail) { %><span><%= t.detail %></span><% } %></span>
               </figcaption>
             </figure>
           <% }) %>
@@ -108,7 +108,9 @@
         <textarea id="loved-quote" name="quote" maxlength="600" required></textarea>
         <label for="loved-name">Name</label>
         <input id="loved-name" name="name" type="text" maxlength="80" required placeholder="For example, Sarah M.">
-        <label for="loved-detail">Town or product (optional)</label>
+        <label for="loved-product">Product (optional)</label>
+        <input id="loved-product" name="product" type="text" maxlength="80" placeholder="For example, Sweet Orange &amp; Copaiba">
+        <label for="loved-detail">Town (optional)</label>
         <input id="loved-detail" name="detail" type="text" maxlength="80" placeholder="For example, Rangiora">
         <label class="check"><input type="checkbox" name="published" checked> Show on the homepage</label>
         <div class="loved-desk-actions">

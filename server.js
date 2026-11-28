@@ -953,7 +953,16 @@ function contactInbox() {
 }
 
 function blankNote() {
-  return { name: '', email: '', topic: '', message: '', permit: false, showTown: false, town: '' };
+  return { name: '', email: '', topic: '', message: '', permit: false, showTown: false, town: '', product: '' };
+}
+
+function testimonialProducts() {
+  return onSale(db.all(
+    `SELECT p.name, p.category_id
+     FROM products p JOIN categories c ON c.id = p.category_id
+     WHERE p.launched = 1
+     ORDER BY c.sort_order, p.name`
+  )).map((row) => shopName(row.name)).filter(Boolean);
 }
 
 function readContact(body) {
@@ -964,6 +973,9 @@ function readContact(body) {
   const permit = body.permit === 'on' || body.permit === 'yes';
   const showTown = body.show_town === 'on' || body.show_town === 'yes';
   const town = String(body.town || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80);
+  const offered = testimonialProducts();
+  const chosen = String(body.product || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80);
+  const product = offered.includes(chosen) ? chosen : '';
   const testimonial = topic === TESTIMONIAL_TOPIC;
   const errors = {};
   if (name.length < 2) errors.name = 'Please add your name.';
@@ -976,20 +988,22 @@ function readContact(body) {
   }
   if (testimonial && !permit) errors.permit = 'Tick this if you’re happy for us to show your words and your name.';
   if (testimonial && showTown && town.length < 2) errors.town = 'Add the town you’d like us to show.';
-  return { name, email, topic, message, permit, showTown, town, errors, honey: String(body.company || '').trim() };
+  if (testimonial && chosen && !product) errors.product = 'Choose a product from the list.';
+  return { name, email, topic, message, permit, showTown, town, product, errors, honey: String(body.company || '').trim() };
 }
 
 function saveTestimonialDraft(note) {
   const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
   db.run(
-    'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, 0, 0, ?, ?)',
-    [note.message.slice(0, 600), note.name, note.showTown ? note.town : '', Number(max.m) + 1, new Date().toISOString()]
+    'INSERT INTO testimonials (quote, name, detail, product, rating, published, sort_order, created_at) VALUES (?, ?, ?, ?, 0, 0, ?, ?)',
+    [note.message.slice(0, 600), note.name, note.showTown ? note.town : '', note.product || '', Number(max.m) + 1, new Date().toISOString()]
   );
   db.save();
 }
 
 function contactMailto(note, inbox) {
   const lines = ['Name: ' + note.name, 'Email: ' + note.email, 'About: ' + note.topic];
+  if (note.product) lines.push('Product: ' + note.product);
   if (note.showTown && note.town) lines.push('Town: ' + note.town);
   lines.push('', note.message);
   const body = lines.join('\n');
@@ -1031,6 +1045,7 @@ function renderContact(res, extras) {
         sendFailed: false,
         limited: false,
         note: blankNote(),
+        products: testimonialProducts(),
         errors: {},
         mailto: '',
       },
@@ -1836,6 +1851,7 @@ function readTestimonial(body) {
     quote: String(body.quote || '').replace(/\u0000/g, '').trim().slice(0, 600),
     name: String(body.name || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
     detail: String(body.detail || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
+    product: String(body.product || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80),
     published: body.published ? 1 : 0,
   };
 }
@@ -1857,8 +1873,8 @@ app.post('/admin/testimonials', requireAdmin, (req, res) => {
   }
   const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
   db.run(
-    'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, 0, ?, ?, ?)',
-    [fields.quote, fields.name, fields.detail, fields.published, Number(max.m) + 1, new Date().toISOString()]
+    'INSERT INTO testimonials (quote, name, detail, product, rating, published, sort_order, created_at) VALUES (?, ?, ?, ?, 0, ?, ?, ?)',
+    [fields.quote, fields.name, fields.detail, fields.product, fields.published, Number(max.m) + 1, new Date().toISOString()]
   );
   db.save();
   req.session.flash = fields.published ? 'Testimonial added to the homepage.' : 'Testimonial saved as a draft.';
@@ -1872,8 +1888,8 @@ app.post('/admin/testimonials/:id', requireAdmin, (req, res) => {
     req.session.flash = 'A testimonial needs the customer’s words and a name.';
     return res.redirect('/admin/testimonials#t-' + id);
   }
-  db.run('UPDATE testimonials SET quote = ?, name = ?, detail = ?, published = ? WHERE id = ?', [
-    fields.quote, fields.name, fields.detail, fields.published, id,
+  db.run('UPDATE testimonials SET quote = ?, name = ?, detail = ?, product = ?, published = ? WHERE id = ?', [
+    fields.quote, fields.name, fields.detail, fields.product, fields.published, id,
   ]);
   db.save();
   req.session.flash = 'Testimonial updated.';

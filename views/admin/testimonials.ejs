@@ -14,7 +14,9 @@
           <textarea id="quote-<%= t.id %>" name="quote" maxlength="600" required><%= t.quote %></textarea>
           <label for="name-<%= t.id %>">Name</label>
           <input id="name-<%= t.id %>" name="name" type="text" maxlength="80" required value="<%= t.name %>">
-          <label for="detail-<%= t.id %>">Town or product (optional)</label>
+          <label for="product-<%= t.id %>">Product (optional)</label>
+          <input id="product-<%= t.id %>" name="product" type="text" maxlength="80" value="<%= t.product || '' %>">
+          <label for="detail-<%= t.id %>">Town (optional)</label>
           <input id="detail-<%= t.id %>" name="detail" type="text" maxlength="80" value="<%= t.detail || '' %>">
           <label class="check"><input type="checkbox" name="published" <%= Number(t.published) ? 'checked' : '' %>> Show on the homepage</label>
           <div class="faq-admin-actions">
@@ -35,7 +37,9 @@
         <textarea id="new-quote" name="quote" maxlength="600" required></textarea>
         <label for="new-name">Name</label>
         <input id="new-name" name="name" type="text" maxlength="80" required placeholder="For example, Sarah M.">
-        <label for="new-detail">Town or product (optional)</label>
+        <label for="new-product">Product (optional)</label>
+        <input id="new-product" name="product" type="text" maxlength="80" placeholder="For example, Sweet Orange &amp; Copaiba">
+        <label for="new-detail">Town (optional)</label>
         <input id="new-detail" name="detail" type="text" maxlength="80" placeholder="For example, Rangiora">
         <label class="check"><input type="checkbox" name="published" checked> Show on the homepage</label>
         <p style="margin-top:0.9rem;"><button class="btn-still" type="submit">Add testimonial</button></p>
