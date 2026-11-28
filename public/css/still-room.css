@@ -1992,6 +1992,9 @@ textarea { min-height: 110px; }
 .contact-form textarea { min-height: 150px; }
 .testimonial-permit[hidden] { display: none; }
 .testimonial-permit p { margin: 0.35rem 0 0.75rem; color: var(--ink-soft); font-size: 0.95rem; line-height: 1.55; }
+.testimonial-permit .check + .check { margin-top: 0.7rem; }
+.testimonial-town { margin-top: 0.2rem; }
+.testimonial-town[hidden] { display: none; }
 .contact-form .btn-still { margin-top: 1.1rem; }
 
 @media (min-width: 700px) {

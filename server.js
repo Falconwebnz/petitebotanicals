@@ -953,7 +953,7 @@ function contactInbox() {
 }
 
 function blankNote() {
-  return { name: '', email: '', topic: '', message: '', permit: false };
+  return { name: '', email: '', topic: '', message: '', permit: false, showTown: false, town: '' };
 }
 
 function readContact(body) {
@@ -962,6 +962,8 @@ function readContact(body) {
   const topic = CONTACT_TOPICS.includes(body.topic) ? body.topic : '';
   const message = String(body.message || '').trim().slice(0, 1500);
   const permit = body.permit === 'on' || body.permit === 'yes';
+  const showTown = body.show_town === 'on' || body.show_town === 'yes';
+  const town = String(body.town || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 80);
   const testimonial = topic === TESTIMONIAL_TOPIC;
   const errors = {};
   if (name.length < 2) errors.name = 'Please add your name.';
@@ -973,20 +975,24 @@ function readContact(body) {
     errors.message = 'Keep a homepage note to 600 characters.';
   }
   if (testimonial && !permit) errors.permit = 'Tick this if you’re happy for us to show your words and your name.';
-  return { name, email, topic, message, permit, errors, honey: String(body.company || '').trim() };
+  if (testimonial && showTown && town.length < 2) errors.town = 'Add the town you’d like us to show.';
+  return { name, email, topic, message, permit, showTown, town, errors, honey: String(body.company || '').trim() };
 }
 
 function saveTestimonialDraft(note) {
   const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
   db.run(
     'INSERT INTO testimonials (quote, name, detail, rating, published, sort_order, created_at) VALUES (?, ?, ?, 0, 0, ?, ?)',
-    [note.message.slice(0, 600), note.name, '', Number(max.m) + 1, new Date().toISOString()]
+    [note.message.slice(0, 600), note.name, note.showTown ? note.town : '', Number(max.m) + 1, new Date().toISOString()]
   );
   db.save();
 }
 
 function contactMailto(note, inbox) {
-  const body = ['Name: ' + note.name, 'Email: ' + note.email, 'About: ' + note.topic, '', note.message].join('\n');
+  const lines = ['Name: ' + note.name, 'Email: ' + note.email, 'About: ' + note.topic];
+  if (note.showTown && note.town) lines.push('Town: ' + note.town);
+  lines.push('', note.message);
+  const body = lines.join('\n');
   return (
     'mailto:' +
     inbox +
