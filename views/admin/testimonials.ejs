@@ -5,7 +5,7 @@
   <section class="section" style="padding-top:1.4rem;">
     <div class="still-wrap" style="max-width:820px;">
       <h1 class="serif" style="font-size:3rem;">Testimonials</h1>
-      <p class="muted">These appear in the Loved by Customers slider on the homepage, below the featured products. Only testimonials marked “Show on the homepage” are shown, and the section stays hidden until at least one is. Use a customer’s own words, with their permission.</p>
+      <p class="muted">These appear in the Loved by Customers band on the homepage, under the featured products. Until one is marked “Show on the homepage”, visitors see a short line and a link to write in. Use a customer’s own words, with their permission.</p>
       <% var published = testimonials.filter(function (t) { return Number(t.published); }).length; %>
       <p class="muted"><strong><%= published %></strong> of <%= testimonials.length %> on the homepage.</p>
       <% testimonials.forEach(function (t, index) { %>

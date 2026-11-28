@@ -59,13 +59,13 @@
     </div>
   </section>
 
-  <% if (testimonials.length) { %>
   <section class="section loved" aria-labelledby="loved-heading">
     <div class="still-wrap loved-wrap">
       <div class="section-head">
         <p class="eyebrow">Kind words</p>
         <h2 id="loved-heading">Loved by Customers</h2>
       </div>
+      <% if (testimonials.length) { %>
       <div class="loved-slider" data-slider role="region" aria-roledescription="carousel" aria-label="Customer testimonials">
         <div class="loved-track" data-slider-track tabindex="0">
           <% testimonials.forEach(function (t, i) { %>
@@ -76,7 +76,10 @@
               <blockquote>
                 <% String(t.quote).split(/\n\s*\n/).forEach(function (para) { %><% if (para.trim()) { %><p><%= para.trim() %></p><% } %><% }) %>
               </blockquote>
-              <figcaption><strong><%= t.name %></strong><% if (t.detail) { %><span><%= t.detail %></span><% } %></figcaption>
+              <figcaption>
+                <span class="loved-mark" aria-hidden="true"><%= String(t.name || '').trim().charAt(0) %></span>
+                <span class="loved-who"><strong><%= t.name %></strong><% if (t.detail) { %><span><%= t.detail %></span><% } %></span>
+              </figcaption>
             </figure>
           <% }) %>
         </div>
@@ -92,9 +95,14 @@
           </div>
         <% } %>
       </div>
+      <% } else { %>
+      <p class="loved-waiting">Notes from people who use the collection will be added here.</p>
+      <div class="text-tabs loved-waiting-actions">
+        <a class="text-tab" href="/contact">Write to us</a>
+      </div>
+      <% } %>
     </div>
   </section>
-  <% } %>
 
   <section class="quiet quiet-coast">
     <img class="quiet-photo" src="/images/brand/home-coast.jpg" alt="" oncontextmenu="return false;">
