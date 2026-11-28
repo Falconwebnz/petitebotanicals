@@ -63,8 +63,8 @@
                   <% }) %>
                 </select>
                 <% if (errors.topic) { %><p class="field-error" id="topic-error"><%= errors.topic %></p><% } %>
-                <div class="collection-note" data-collection-note<% if (note.topic !== 'Local collection') { %> hidden<% } %>>
-                  <p>There is no national delivery just yet, so local collection saves the shipping charge. Please read <a href="/pickup" target="_blank" rel="noopener">Click &amp; Collect</a> for how to use it.</p>
+                <div class="collection-note text-tabs" data-collection-note<% if (note.topic !== 'Local collection') { %> hidden<% } %>>
+                  <a class="text-tab" href="/pickup" target="_blank" rel="noopener">Click &amp; Collect</a>
                 </div>
               </div>
               <div class="span-2 testimonial-permit" data-testimonial-extra<% if (note.topic !== 'A testimonial') { %> hidden<% } %>>
