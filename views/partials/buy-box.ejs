@@ -1,13 +1,10 @@
 <div class="buy-col">
   <p class="eyebrow"><%= product.category_name %></p>
-  <h1><%= product.name %></h1>
-  <% if (product.notes) { %><p><%= product.notes %></p><% } %>
+  <h1><%= shopName(product.name) %></h1>
+  <% if (product.notes) { %><div class="buy-notes"><%- include('text-blocks', { blocks: textBlocks(product.notes) }) %></div><% } %>
   <p class="buy-price"><%= nzd(product.price_cents) %></p>
   <p class="muted"><%= product.size || 'Size to be set' %></p>
   <%- include('stock-label', { product: product }) %>
-  <% if (product.is_starter) { %>
-    <p class="starter-note">Starter listing. Replace the name, size, price and formula before this is offered for sale. The price is a placeholder.</p>
-  <% } %>
   <% if (Number(product.launched) && (Number(product.stock) || 0) > 0) { %>
     <form method="post" action="/cart/add">
       <input type="hidden" name="id" value="<%= product.id %>">

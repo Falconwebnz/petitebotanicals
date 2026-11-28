@@ -14,7 +14,7 @@
       <% } else { %>
         <ul style="padding-left:1.1rem;">
           <% cart.items.forEach(function (item) { %>
-            <li><%= item.product.name %> × <%= item.qty %> — <%= nzd(item.lineTotal) %></li>
+            <li><%= shopName(item.product.name) %> × <%= item.qty %> — <%= nzd(item.lineTotal) %></li>
           <% }) %>
         </ul>
         <p class="buy-price"><%= nzd(cart.subtotal) %></p>

@@ -21,8 +21,8 @@
             <% cart.items.forEach(function (item) { %>
               <tr>
                 <td>
-                  <a href="/product/<%= item.product.slug %>" target="_blank" rel="noopener"><strong><%= item.product.name %></strong></a>
-                  <div class="muted"><%= item.product.size %><% if (item.product.is_starter) { %> · starter<% } %></div>
+                  <a href="/product/<%= item.product.slug %>" target="_blank" rel="noopener"><strong><%= shopName(item.product.name) %></strong></a>
+                  <div class="muted"><%= item.product.size %></div>
                   <%- include('partials/stock-label', { product: item.product }) %>
                 </td>
                 <td><%= nzd(item.lineTotal) %></td>

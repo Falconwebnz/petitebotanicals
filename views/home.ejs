@@ -19,7 +19,7 @@
       <div class="section-head">
         <p class="eyebrow">The collection</p>
         <h2>Botanical scent. Everyday care.</h2>
-        <p>Explore botanical perfumes, nourishing balms, magnesium body mist and room mists — a considered collection for skin, body and home.</p>
+        <p>Explore botanical perfumes, nourishing balms, magnesium body mists and room mists — a considered collection for skin, body and home.</p>
       </div>
     </div>
   </section>
@@ -35,7 +35,7 @@
             <span class="drawer-scrim" aria-hidden="true"></span>
           <% } %>
           <span class="drawer-copy">
-            <h3><%= cat.slug === 'mist-sprays' ? 'Magnesium Body Mists' : cat.name %></h3>
+            <h3><%= cat.name %></h3>
             <% if (cat.line) { %><p><%= cat.line %></p><% } %>
           </span>
         </a>
@@ -58,6 +58,43 @@
       </div>
     </div>
   </section>
+
+  <% if (testimonials.length) { %>
+  <section class="section loved" aria-labelledby="loved-heading">
+    <div class="still-wrap loved-wrap">
+      <div class="section-head">
+        <p class="eyebrow">Kind words</p>
+        <h2 id="loved-heading">Loved by Customers</h2>
+      </div>
+      <div class="loved-slider" data-slider role="region" aria-roledescription="carousel" aria-label="Customer testimonials">
+        <div class="loved-track" data-slider-track tabindex="0">
+          <% testimonials.forEach(function (t, i) { %>
+            <figure class="loved-card" role="group" aria-roledescription="slide" aria-label="<%= i + 1 %> of <%= testimonials.length %>">
+              <% if (Number(t.rating)) { %>
+                <p class="loved-stars" role="img" aria-label="Rated <%= t.rating %> out of 5"><span aria-hidden="true"><%= '★'.repeat(t.rating) %></span><span class="loved-stars-off" aria-hidden="true"><%= '★'.repeat(5 - t.rating) %></span></p>
+              <% } %>
+              <blockquote>
+                <% String(t.quote).split(/\n\s*\n/).forEach(function (para) { %><% if (para.trim()) { %><p><%= para.trim() %></p><% } %><% }) %>
+              </blockquote>
+              <figcaption><strong><%= t.name %></strong><% if (t.detail) { %><span><%= t.detail %></span><% } %></figcaption>
+            </figure>
+          <% }) %>
+        </div>
+        <% if (testimonials.length > 1) { %>
+          <div class="loved-controls">
+            <button class="loved-arrow" type="button" data-slider-prev aria-label="Previous testimonial">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="loved-dots" data-slider-dots></div>
+            <button class="loved-arrow" type="button" data-slider-next aria-label="Next testimonial">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+  <% } %>
 
   <section class="quiet quiet-coast">
     <img class="quiet-photo" src="/images/brand/home-coast.jpg" alt="" oncontextmenu="return false;">

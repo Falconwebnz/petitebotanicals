@@ -2,7 +2,7 @@
 <script type="application/ld+json"><%- jsonLd({
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: product.name,
+  name: shopName(product.name),
   description: [product.short_description, product.ingredients].filter(Boolean).join(' '),
   category: product.category_name,
   brand: { '@type': 'Brand', name: 'Petite Botanicals' },
@@ -21,38 +21,40 @@
     <div>
       <div class="figure-frame">
         <% if (liveImage(product.image)) { %>
-          <img src="<%= liveImage(product.image) %>" alt="<%= product.name %>" oncontextmenu="return false;">
+          <img src="<%= liveImage(product.image) %>" alt="<%= shopName(product.name) %>" oncontextmenu="return false;">
         <% } else { %>
           <div class="plate">
             <span><%= product.category_name %></span>
-            <strong><%= product.name.replace(' (starter)', '') %></strong>
+            <strong><%= shopName(product.name) %></strong>
           </div>
         <% } %>
       </div>
       <div class="mobile-buy" style="margin-top:1rem;">
         <%- include('partials/buy-box', { product: product }) %>
       </div>
-      <div class="card-block">
-        <h2>The scent</h2>
-        <div class="pre"><%= product.long_description %></div>
-      </div>
+      <% if (product.long_description) { %>
+        <div class="card-block">
+          <h2>The scent</h2>
+          <div class="prose-text"><%- include('partials/text-blocks', { blocks: textBlocks(product.long_description) }) %></div>
+        </div>
+      <% } %>
       <% if (product.ingredients) { %>
         <div class="card-block">
-          <h2>Botanicals</h2>
-          <div class="pre"><%= product.ingredients %></div>
+          <h2>Ingredients</h2>
+          <div class="prose-text"><%- include('partials/text-blocks', { blocks: textBlocks(product.ingredients) }) %></div>
           <p class="fine"><a href="/glossary" target="_blank" rel="noopener">Read the glossary</a> for the plain-English names.</p>
         </div>
       <% } %>
       <% if (product.how_to_use) { %>
         <div class="card-block">
           <h2>How to use</h2>
-          <div class="pre"><%= product.how_to_use %></div>
+          <div class="prose-text"><%- include('partials/text-blocks', { blocks: textBlocks(product.how_to_use) }) %></div>
         </div>
       <% } %>
       <% if (product.precautions) { %>
         <div class="card-block">
-          <h2>Care</h2>
-          <div class="pre"><%= product.precautions %></div>
+          <h2>Precautions</h2>
+          <div class="prose-text"><%- include('partials/text-blocks', { blocks: textBlocks(product.precautions) }) %></div>
         </div>
       <% } %>
       <% if (faqs && faqs.length) { %>

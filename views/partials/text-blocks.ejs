@@ -1,0 +1,13 @@
+<% (blocks || []).forEach(function (block) { %>
+  <% if (block.type === 'h3') { %>
+    <h3><%= block.text %></h3>
+  <% } else if (block.type === 'ul') { %>
+    <ul>
+      <% block.items.forEach(function (item) { %>
+        <li><%- include('rich', { parts: item }) %></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p><%- include('rich', { parts: block.parts }) %></p>
+  <% } %>
+<% }) %>

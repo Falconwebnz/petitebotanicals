@@ -1,0 +1,61 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<main>
+  <%- include('../partials/desk-bar') %>
+  <section class="section" style="padding-top:1.4rem;">
+    <div class="still-wrap" style="max-width:820px;">
+      <h1 class="serif" style="font-size:3rem;">Testimonials</h1>
+      <p class="muted">These appear in the Loved by Customers slider on the homepage, below the featured products. Only testimonials marked “Show on the homepage” are shown, and the section stays hidden until at least one is. Use a customer’s own words, with their permission.</p>
+      <% var published = testimonials.filter(function (t) { return Number(t.published); }).length; %>
+      <p class="muted"><strong><%= published %></strong> of <%= testimonials.length %> on the homepage.</p>
+      <% testimonials.forEach(function (t, index) { %>
+        <form class="faq-admin" id="t-<%= t.id %>" method="post" action="/admin/testimonials/<%= t.id %>">
+          <label for="quote-<%= t.id %>">What they said</label>
+          <textarea id="quote-<%= t.id %>" name="quote" maxlength="600" required><%= t.quote %></textarea>
+          <label for="name-<%= t.id %>">Name</label>
+          <input id="name-<%= t.id %>" name="name" type="text" maxlength="80" required value="<%= t.name %>">
+          <label for="detail-<%= t.id %>">Town or product (optional)</label>
+          <input id="detail-<%= t.id %>" name="detail" type="text" maxlength="80" value="<%= t.detail || '' %>">
+          <label for="rating-<%= t.id %>">Stars</label>
+          <select id="rating-<%= t.id %>" name="rating">
+            <% [5, 4, 3, 2, 1, 0].forEach(function (n) { %>
+              <option value="<%= n %>"<%= Number(t.rating) === n ? ' selected' : '' %>><%= n ? n + ' of 5' : 'No stars' %></option>
+            <% }) %>
+          </select>
+          <label class="check"><input type="checkbox" name="published" <%= Number(t.published) ? 'checked' : '' %>> Show on the homepage</label>
+          <div class="faq-admin-actions">
+            <button class="btn-still" type="submit">Save</button>
+            <% if (index > 0) { %>
+              <button class="btn-line" type="submit" formaction="/admin/testimonials/<%= t.id %>/move" name="direction" value="up">Move up</button>
+            <% } %>
+            <% if (index < testimonials.length - 1) { %>
+              <button class="btn-line" type="submit" formaction="/admin/testimonials/<%= t.id %>/move" name="direction" value="down">Move down</button>
+            <% } %>
+            <button class="btn-line" type="submit" formaction="/admin/testimonials/<%= t.id %>/delete" formnovalidate>Remove</button>
+          </div>
+        </form>
+      <% }) %>
+      <form class="faq-admin faq-admin-new" id="new" method="post" action="/admin/testimonials">
+        <p class="eyebrow">Add a testimonial</p>
+        <label for="new-quote">What they said</label>
+        <textarea id="new-quote" name="quote" maxlength="600" required></textarea>
+        <label for="new-name">Name</label>
+        <input id="new-name" name="name" type="text" maxlength="80" required placeholder="For example, Sarah M.">
+        <label for="new-detail">Town or product (optional)</label>
+        <input id="new-detail" name="detail" type="text" maxlength="80" placeholder="For example, Rangiora">
+        <label for="new-rating">Stars</label>
+        <select id="new-rating" name="rating">
+          <option value="5">5 of 5</option>
+          <option value="4">4 of 5</option>
+          <option value="3">3 of 5</option>
+          <option value="2">2 of 5</option>
+          <option value="1">1 of 5</option>
+          <option value="0">No stars</option>
+        </select>
+        <label class="check"><input type="checkbox" name="published" checked> Show on the homepage</label>
+        <p style="margin-top:0.9rem;"><button class="btn-still" type="submit">Add testimonial</button></p>
+      </form>
+    </div>
+  </section>
+</main>
+<%- include('../partials/footer') %>
