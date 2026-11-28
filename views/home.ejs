@@ -98,27 +98,6 @@
         <a class="text-tab" href="/contact">Write to us</a>
       </div>
       <% } %>
-      <% if (admin) { %>
-      <form class="loved-desk" id="loved-add" method="post" action="/admin/testimonials">
-        <p class="eyebrow">Desk</p>
-        <h3>Add a customer note</h3>
-        <p class="loved-desk-lead">Use their own words, with their permission. A note marked “Show on the homepage” replaces the waiting line and appears in this band.</p>
-        <input type="hidden" name="return_to" value="home">
-        <label for="loved-quote">What they said</label>
-        <textarea id="loved-quote" name="quote" maxlength="600" required></textarea>
-        <label for="loved-name">Name</label>
-        <input id="loved-name" name="name" type="text" maxlength="80" required placeholder="For example, Sarah M.">
-        <label for="loved-product">Product (optional)</label>
-        <input id="loved-product" name="product" type="text" maxlength="80" placeholder="For example, Sweet Orange &amp; Copaiba">
-        <label for="loved-detail">Town (optional)</label>
-        <input id="loved-detail" name="detail" type="text" maxlength="80" placeholder="For example, Rangiora">
-        <label class="check"><input type="checkbox" name="published" checked> Show on the homepage</label>
-        <div class="loved-desk-actions">
-          <button class="btn-still" type="submit">Add to Loved by Customers</button>
-          <a href="/admin/testimonials">Edit saved notes</a>
-        </div>
-      </form>
-      <% } %>
     </div>
   </section>
 
