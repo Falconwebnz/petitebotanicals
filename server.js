@@ -258,7 +258,7 @@ const LOCAL_COLLECTION_ONLY = true;
 const DELIVERY_COPY = {
   delivery_label: 'Delivery nationwide',
   shipping_prompt: 'Where to leave the parcel, a gate, or a dog in the yard.',
-  lockbox_note: 'A lock box is available for local pickups.',
+  lockbox_note: 'The padlock code is the last four digits of your mobile number. We text you when the order is in the lockbox.',
 };
 
 const STANDARDS_FIELDS = PAGE_GROUPS.standards;
@@ -359,9 +359,20 @@ function ensureLocalCollection() {
       'At checkout, choose local pickup. Leave the name on the parcel, or a time that suits. Delivery nationwide is still there when a parcel needs to travel.',
       'Collect from the studio lockbox in Rangiora. At checkout, leave a name for the lockbox. We email or text the combination code when the order is ready.',
     ],
+    [
+      'Collect from the studio lockbox in Rangiora. At checkout, leave a name for the lockbox. We email or text the combination code when the order is ready.',
+      'There is no national delivery just yet, so collecting your order saves the shipping charge.\n\nAt checkout, give us the mobile number you want us to text. The padlock code is the last four digits of that number.\n\nWhen your order is in the lockbox, we text you to say it is ready, and where to collect it.',
+    ],
+  ]) || changed;
+  changed = patchSetting('pickup_lead', [
+    ['A lock box is available for local pickups.', 'A lockbox on the property, with a padlock.'],
   ]) || changed;
   changed = patchSetting('pickup_aside', [
     ['Local collection, or delivery nationwide.', 'Studio collection in Rangiora.'],
+    ['Studio collection in Rangiora.', 'Collection in Rangiora.'],
+  ]) || changed;
+  changed = patchSetting('lockbox_note', [
+    ['A lock box is available for local pickups.', 'The padlock code is the last four digits of your mobile number. We text you when the order is in the lockbox.'],
   ]) || changed;
   changed = patchSetting('terms_body', [
     [
@@ -369,12 +380,24 @@ function ensureLocalCollection() {
       'Click and collect from the studio lockbox is described on the Click & Collect page and again at checkout.',
     ],
     [
+      'Click and collect from the studio lockbox is described on the Click & Collect page and again at checkout.',
+      'Collection from the lockbox is described on the Click & Collect page and again at checkout.',
+    ],
+    [
       'Delivery and local pickup are described on the [Delivery & Pick up](/pickup) page and again at checkout. Please give a delivery address we can reach, or the name and time that suit a local pickup. Risk in the goods passes to you when the parcel is delivered to the address you gave, or when you collect it.',
       'Click and collect from the studio lockbox is described on the [Click & Collect](/pickup) page and again at checkout. Leave the name for the lockbox, or a time that suits. Risk in the goods passes to you when you collect your order.',
     ],
     [
+      'Click and collect from the studio lockbox is described on the [Click & Collect](/pickup) page and again at checkout. Leave the name for the lockbox, or a time that suits. Risk in the goods passes to you when you collect your order.',
+      'Collection from the lockbox is described on the [Click & Collect](/pickup) page and again at checkout. Give us the mobile number you want us to text. The padlock code is the last four digits of that number. Risk in the goods passes to you when you collect your order.',
+    ],
+    [
       'Please provide a delivery address we can reach, or the name and pickup time that suit a local pickup.',
       'Leave the name for the lockbox, or a time that suits.',
+    ],
+    [
+      'Leave the name for the lockbox, or a time that suits.',
+      'Give us the mobile number you want us to text. The padlock code is the last four digits of that number.',
     ],
     [
       'Risk in the products passes to you when the parcel is delivered to the address you provided, or when you collect your order.',
@@ -398,16 +421,32 @@ function ensureLocalCollection() {
       'If you do not give us a name for the lockbox, we may not be able to complete your order.',
     ],
     [
+      'If you do not give us a name for the lockbox, we may not be able to complete your order.',
+      'If you do not give us a mobile number for the lockbox, we may not be able to complete your order.',
+    ],
+    [
       'If you do not give us the details a courier or a pickup needs, we may not be able to complete the order.',
       'If you do not give us a name for the lockbox, we may not be able to complete the order.',
+    ],
+    [
+      'If you do not give us a name for the lockbox, we may not be able to complete the order.',
+      'If you do not give us a mobile number for the lockbox, we may not be able to complete the order.',
     ],
     [
       'Take, make, and deliver an order, or hold it for local pickup',
       'Take, make, and hold an order for studio collection',
     ],
     [
+      'Take, make, and hold an order for studio collection',
+      'Take, make, and hold an order for collection from the lockbox',
+    ],
+    [
       'Take, make and deliver an order, or hold it for local pickup',
       'Take, make and hold an order for studio collection',
+    ],
+    [
+      'Take, make and hold an order for studio collection',
+      'Take, make and hold an order for collection from the lockbox',
     ],
     ['A courier, when you choose delivery', ''],
   ]) || changed;
@@ -430,21 +469,21 @@ function ensureLocalCollection() {
       question: 'Where do you deliver, and do you offer local pick up?',
       nextQuestion: 'How do I collect my order?',
       answer:
-        'Orders are click and collect from the studio lockbox in Rangiora. We email or text the combination code when your order is ready.\n\nThe arrangements are on [Click & Collect](/pickup).',
+        'Orders are collected from a lockbox on the property in Rangiora. At checkout, give us the mobile number you want us to text. The padlock code is the last four digits of that number.\n\nWe text you when the order is in the lockbox, and where to collect it.\n\nThe arrangements are on [Click & Collect](/pickup).',
     },
     {
       id: 41,
       question: 'When will my order be ready or dispatched?',
       nextQuestion: 'When will my order be ready?',
       answer:
-        'Because everything is made in small batches, orders are usually hand-poured and placed in the lockbox within 1 to 2 business days. We email or text the combination code when it is ready for collection.',
+        'Because everything is made in small batches, orders are usually placed in the lockbox within 1 to 2 business days. We text you when it is ready. The padlock code is the last four digits of the mobile number you gave at checkout.',
     },
     {
       id: 40,
       question: 'How does the Local Pickup lockbox work?',
       nextQuestion: 'How does the Local Pickup lockbox work?',
       answer:
-        'To make collection completely contactless and flexible for your schedule, we use a secure on-site lockbox system:\n1. Place your order online. Every order is click and collect from the studio lockbox.\n2. Once your order is hand-blended and packed, we will send you a text or email confirming it is ready.\n3. Your message will include our collection address, a unique access code, and your assigned lockbox number.\n4. You can then swing by and collect your order whenever it suits you best—day or night.',
+        'The lockbox is on the property, with a padlock.\n\nAt checkout, give us the mobile number you want us to text. The padlock code is the last four digits of that number. We text you when the order is in the lockbox, and where to collect it.',
     },
     {
       id: 42,
@@ -459,6 +498,14 @@ function ensureLocalCollection() {
     if (!current || current.question !== row.question || current.answer === row.answer) return;
     db.run('UPDATE faqs SET question = ?, answer = ? WHERE id = ?', [row.nextQuestion, row.answer, row.id]);
     changed = true;
+  });
+  faqUpdates.forEach((row) => {
+    db.all('SELECT id, answer FROM faqs WHERE question = ?', [row.nextQuestion]).forEach((current) => {
+      if (current.answer === row.answer) return;
+      if (!/combination code|unique access code/i.test(current.answer)) return;
+      db.run('UPDATE faqs SET answer = ? WHERE id = ?', [row.answer, current.id]);
+      changed = true;
+    });
   });
   if (changed) db.save();
 }
@@ -509,6 +556,7 @@ function checkoutLocals(cart, opts) {
     fulfilment: method,
     shippingNote: method === 'delivery' ? note : '',
     pickupNote: method === 'pickup' ? note : '',
+    phoneError: opts.phoneError || '',
   };
 }
 
@@ -1246,6 +1294,14 @@ app.post('/checkout', async (req, res) => {
     return res.redirect('/cart');
   }
   const saved = persistFulfilment(req);
+  if (saved.method === 'pickup' && saved.note.replace(/\D/g, '').length < 8) {
+    return res.status(400).render('checkout', checkoutLocals(cart, {
+      saved,
+      stripeReady: stripeReady(),
+      stripeError: null,
+      phoneError: 'Add the mobile number you want us to text. The padlock uses its last four digits.',
+    }));
+  }
   rememberOrderItems(req.session.draftOrderId, cart);
   if (!stripeReady()) {
     return res.status(400).render('checkout', checkoutLocals(cart, {
