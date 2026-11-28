@@ -1336,6 +1336,7 @@ app.get('/admin', requireAdmin, (req, res) => {
     starters: db.get('SELECT COUNT(*) AS n FROM products WHERE is_starter = 1').n,
     outOfStock: db.get('SELECT COUNT(*) AS n FROM products WHERE launched = 1 AND stock < 1').n,
     readyToLaunch: db.get('SELECT COUNT(*) AS n FROM products WHERE launched = 0 AND stock > 0').n,
+    notes: db.get('SELECT COUNT(*) AS n FROM testimonials WHERE published = 1').n,
   };
   res.render('admin/dashboard', { title: 'Desk', counts });
 });
@@ -1818,14 +1819,15 @@ function allTestimonials() {
 }
 
 app.get('/admin/testimonials', requireAdmin, (req, res) => {
-  res.render('admin/testimonials', { title: 'Testimonials', testimonials: allTestimonials() });
+  res.render('admin/testimonials', { title: 'Loved by Customers', testimonials: allTestimonials() });
 });
 
 app.post('/admin/testimonials', requireAdmin, (req, res) => {
   const fields = readTestimonial(req.body);
+  const home = req.body.return_to === 'home';
   if (!fields.quote || !fields.name) {
     req.session.flash = 'A testimonial needs the customer’s words and a name.';
-    return res.redirect('/admin/testimonials#new');
+    return res.redirect(home ? '/#loved-add' : '/admin/testimonials#new');
   }
   const max = db.get('SELECT COALESCE(MAX(sort_order), -1) AS m FROM testimonials');
   db.run(
@@ -1834,7 +1836,7 @@ app.post('/admin/testimonials', requireAdmin, (req, res) => {
   );
   db.save();
   req.session.flash = fields.published ? 'Testimonial added to the homepage.' : 'Testimonial saved as a draft.';
-  res.redirect('/admin/testimonials');
+  res.redirect(home ? '/#loved-heading' : '/admin/testimonials');
 });
 
 app.post('/admin/testimonials/:id', requireAdmin, (req, res) => {
