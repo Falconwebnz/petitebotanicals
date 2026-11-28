@@ -42,7 +42,8 @@
         <label class="visually-hidden" for="q">Search</label>
         <input id="q" name="q" type="search" placeholder="Products and ingredients" value="<%= typeof q !== 'undefined' ? q : '' %>">
       </form>
-      <a class="icon-btn" href="/cart" target="_blank" rel="noopener" aria-label="Basket">
+      <a class="icon-btn basket-link" href="/cart" target="_blank" rel="noopener" aria-label="Basket">
+        <span class="basket-word">Basket</span>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 7h15l-1.4 8.2a2 2 0 0 1-2 1.6H9.2a2 2 0 0 1-2-1.6L5.2 4H3" stroke="currentColor" stroke-width="1.4"/><circle cx="9" cy="20" r="1.2" fill="currentColor"/><circle cx="17" cy="20" r="1.2" fill="currentColor"/></svg>
         <% if (cartCount) { %><span class="basket-count"><%= cartCount %></span><% } %>
       </a>
@@ -59,6 +60,7 @@
     <form action="/search" method="get" class="mb-3">
       <input name="q" type="search" placeholder="Products and ingredients" aria-label="Search" value="<%= typeof q !== 'undefined' ? q : '' %>">
     </form>
+    <a href="/cart" target="_blank" rel="noopener">Basket<% if (cartCount) { %> (<%= cartCount %>)<% } %></a>
     <% categories.forEach(function (cat) { %>
       <a href="/category/<%= cat.slug %>" target="_blank" rel="noopener"><%= cat.name %><% if (isComingSoon(cat)) { %> <span class="soon-tag">Coming soon</span><% } %></a>
     <% }) %>
@@ -68,6 +70,5 @@
     <a href="/standards" target="_blank" rel="noopener">Our Standards</a>
     <a href="/pickup" target="_blank" rel="noopener">Click &amp; Collect</a>
     <a href="/contact" target="_blank" rel="noopener">Contact us</a>
-    <a href="/cart" target="_blank" rel="noopener">Basket<% if (cartCount) { %> (<%= cartCount %>)<% } %></a>
   </div>
 </div>

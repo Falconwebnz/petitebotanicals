@@ -461,6 +461,23 @@ a:hover { color: var(--terracotta); }
   text-decoration: none;
 }
 
+.basket-link {
+  width: auto;
+  gap: 0.35rem;
+  padding-left: 0.15rem;
+}
+
+.basket-word {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+@media (min-width: 992px) {
+  .basket-word { display: none; }
+}
+
 .basket-count {
   position: absolute;
   top: 4px;
